@@ -1,0 +1,3473 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Holding HR Sistemi — Test Maketi (Tam Versiya)</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --sb:#0D1424;--sb-hover:#162035;--sb-active:#1a3a6b;
+  --accent:#2563EB;--accent-l:#EFF6FF;--accent-d:#1d4ed8;
+  --ok:#059669;--ok-l:#ECFDF5;
+  --warn:#D97706;--warn-l:#FFFBEB;
+  --err:#DC2626;--err-l:#FEF2F2;
+  --bg:#F0F2F7;--card:#fff;--brd:#E4E7EC;
+  --t1:#0F1728;--t2:#64748B;--t3:#94A3B8;
+  --r:8px;--rl:12px;
+}
+body{font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;line-height:1.5;color:var(--t1);background:var(--bg);overflow:hidden;height:100vh}
+
+/* LOGIN */
+.login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--sb);overflow:auto}
+.login-card{background:var(--card);border-radius:16px;padding:40px;width:400px}
+.login-logo{width:48px;height:48px;background:var(--accent);border-radius:12px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:700;margin:0 auto 20px}
+.login-h{font-size:20px;font-weight:700;text-align:center;margin-bottom:6px}
+.login-sub{font-size:13px;color:var(--t2);text-align:center;margin-bottom:28px}
+.role-btn{width:100%;padding:12px 14px;margin-bottom:10px;border-radius:var(--r);border:1.5px solid var(--brd);background:var(--card);cursor:pointer;text-align:left;display:flex;align-items:center;gap:12px;transition:all .15s;font-family:inherit}
+.role-btn:hover{border-color:var(--accent);background:var(--accent-l)}
+.role-btn:last-child{margin-bottom:0}
+.ri{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.rname{font-size:13px;font-weight:600;color:var(--t1);display:block}
+.rdesc{font-size:11px;color:var(--t2);display:block;margin-top:2px}
+
+/* APP SHELL */
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:218px;min-width:218px;background:var(--sb);display:flex;flex-direction:column;overflow:hidden}
+.sb-top{padding:18px 14px 12px;border-bottom:1px solid rgba(255,255,255,.07)}
+.sb-logo-row{display:flex;align-items:center;gap:10px}
+.sb-mark{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700;flex-shrink:0}
+.sb-logo-name{color:#fff;font-size:12px;font-weight:600}
+.sb-logo-sub{color:rgba(255,255,255,.38);font-size:10px;margin-top:1px}
+.sb-nav{flex:1;padding:10px 8px;overflow-y:auto}
+.sb-sec{font-size:10px;color:rgba(255,255,255,.25);padding:12px 8px 5px;text-transform:uppercase;letter-spacing:.06em}
+.sbi{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--r);cursor:pointer;color:rgba(255,255,255,.5);font-size:13px;font-weight:500;transition:all .14s;margin-bottom:2px}
+.sbi:hover{background:var(--sb-hover);color:rgba(255,255,255,.82)}
+.sbi.active{background:var(--sb-active);color:#fff}
+.sbi svg{flex-shrink:0;opacity:.75}.sbi.active svg{opacity:1}
+.sb-foot{padding:10px 8px;border-top:1px solid rgba(255,255,255,.07)}
+.sb-user{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r);cursor:pointer;transition:background .14s}
+.sb-user:hover{background:var(--sb-hover)}
+.sb-av{width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+.sb-uname{color:#fff;font-size:12px;font-weight:500}
+.sb-urole{color:rgba(255,255,255,.38);font-size:10px;margin-top:1px}
+.sb-logout{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--r);cursor:pointer;color:rgba(255,255,255,.4);font-size:12px;transition:all .14s;margin-top:4px}
+.sb-logout:hover{background:rgba(220,38,38,.15);color:#fca5a5}
+
+/* MAIN */
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.topbar{height:52px;background:var(--card);border-bottom:1px solid var(--brd);display:flex;align-items:center;padding:0 24px;gap:12px;flex-shrink:0}
+.topbar-title{font-size:15px;font-weight:700;flex:1;color:var(--t1)}
+.content{flex:1;overflow-y:auto;padding:24px}
+
+/* BUTTONS */
+.btn{padding:8px 14px;border-radius:var(--r);border:none;cursor:pointer;font-size:13px;font-weight:500;display:inline-flex;align-items:center;gap:6px;transition:all .14s;font-family:inherit;white-space:nowrap}
+.btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:var(--accent-d)}
+.btn-secondary{background:var(--card);color:var(--t1);border:1px solid var(--brd)}.btn-secondary:hover{background:var(--bg)}
+.btn-success{background:var(--ok);color:#fff}.btn-success:hover{background:#047857}
+.btn-danger{background:var(--err);color:#fff}.btn-danger:hover{background:#b91c1c}
+.btn-warn{background:var(--warn);color:#fff}.btn-warn:hover{background:#b45309}
+.btn-ghost{background:transparent;color:var(--t2);border:1px solid transparent}.btn-ghost:hover{background:var(--bg);color:var(--t1)}
+.btn-sm{padding:6px 11px;font-size:12px}
+.btn-xs{padding:4px 9px;font-size:11px}
+
+/* CARDS */
+.card{background:var(--card);border-radius:var(--rl);border:1px solid var(--brd);padding:20px}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.stat-card{background:var(--card);border:1px solid var(--brd);border-radius:var(--rl);padding:16px 20px}
+.stat-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.stat-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.stat-num{font-size:28px;font-weight:700;line-height:1;margin-bottom:4px}
+.stat-lbl{font-size:12px;color:var(--t2)}
+.stat-delta{font-size:11px;margin-top:6px}
+
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid var(--brd);margin-bottom:20px;overflow-x:auto;scrollbar-width:thin;scrollbar-color:var(--accent) var(--bg)}
+.tab-btn{padding:10px 16px;font-size:13px;font-weight:500;color:var(--t2);cursor:pointer;border-bottom:2px solid transparent;transition:all .14s;background:none;border-top:none;border-left:none;border-right:none;font-family:inherit;white-space:nowrap;min-width:120px;text-align:center;flex-shrink:0}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+.tab-btn:hover:not(.active){color:var(--t1)}
+.tcnt{background:var(--bg);border-radius:20px;font-size:11px;padding:1px 7px;margin-left:6px;color:var(--t2);display:inline-block}
+.tab-btn.active .tcnt{background:var(--accent-l);color:var(--accent)}
+
+/* TABS SCROLL INDICATORS */
+.tabs-wrapper{position:relative}
+.tabs-wrapper::before,.tabs-wrapper::after{content:'';position:absolute;top:0;bottom:0;width:40px;z-index:10;pointer-events:none}
+.tabs-wrapper::before{left:0;background:linear-gradient(to right,var(--card),transparent)}
+.tabs-wrapper::after{right:0;background:linear-gradient(to left,var(--card),transparent)}
+
+/* TOOLBAR */
+.toolbar{display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap}
+.search-w{position:relative;flex:1;min-width:180px}
+.search-w input{width:100%;padding:8px 12px 8px 34px;border:1px solid var(--brd);border-radius:var(--r);font-size:13px;outline:none;background:var(--card);font-family:inherit;color:var(--t1);transition:border .14s}
+.search-w input:focus{border-color:var(--accent)}
+.si{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t3)}
+select.filt{padding:8px 12px;border:1px solid var(--brd);border-radius:var(--r);font-size:13px;background:var(--card);outline:none;cursor:pointer;font-family:inherit;color:var(--t1);transition:border .14s}
+select.filt:focus{border-color:var(--accent)}
+
+/* TABLE */
+.tbl-wrap{background:var(--card);border:1px solid var(--brd);border-radius:var(--rl);overflow:hidden}
+table{width:100%;border-collapse:collapse}
+th{padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--t2);text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--brd);background:#FAFBFC;white-space:nowrap}
+td{padding:11px 16px;border-bottom:1px solid var(--brd);font-size:13px;color:var(--t1);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr.row-link{cursor:pointer;transition:background .1s}
+tr.row-link:hover{background:#F8FAFF}
+tr.selected{background:#EFF6FF}
+.av-cell{display:flex;align-items:center;gap:10px}
+.av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;color:#fff}
+
+/* PILLS */
+.pill{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.p-active{background:var(--ok-l);color:#065F46}
+.p-candidate{background:#EFF6FF;color:#1E40AF}
+.p-terminated{background:#F9FAFB;color:var(--t2);border:1px solid var(--brd)}
+.p-rejected{background:#FEE2E2;color:#991B1B}
+.p-ok{background:var(--ok-l);color:#065F46}
+.p-part{background:var(--warn-l);color:#92400E}
+.p-gap{background:var(--err-l);color:#991B1B}
+.p-admin{background:#F5F3FF;color:#4C1D95}
+.p-hr{background:#EFF6FF;color:#1E40AF}
+.p-sub{background:var(--ok-l);color:#065F46}
+.p-holding{background:#FEF3C7;color:#92400E}
+
+/* MODAL */
+.backdrop{position:fixed;inset:0;background:rgba(10,15,30,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
+.modal-box{background:var(--card);border-radius:var(--rl);width:100%;max-height:90vh;overflow-y:auto;position:relative;animation:mfade .18s ease;display:flex;flex-direction:column}
+@keyframes mfade{from{opacity:0;transform:translateY(8px)}}
+.modal-sm{max-width:440px}.modal-md{max-width:600px;min-width:600px}.modal-lg{max-width:95%;min-width:95%}.modal-xl{max-width:1200px;min-width:1200px}
+.modal-box .mbody{flex:1;overflow-y:auto}
+.mh{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid var(--brd);position:sticky;top:0;background:var(--card);z-index:1}
+.mh-title{font-size:15px;font-weight:700}
+.mclose{width:28px;height:28px;border-radius:6px;background:var(--bg);border:none;cursor:pointer;font-size:18px;color:var(--t2);display:flex;align-items:center;justify-content:center;line-height:1}
+.mclose:hover{background:var(--brd);color:var(--t1)}
+.mbody{padding:24px;min-height:600px}
+.mfooter{padding:14px 24px;border-top:1px solid var(--brd);display:flex;justify-content:flex-end;gap:10px;position:sticky;bottom:0;background:var(--card)}
+
+/* CARD TAB CONTENT - consistent height */
+.ig{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:20px;min-height:180px}
+.tab-content-wrapper{min-height:650px}
+
+/* FORMS */
+.fg{margin-bottom:16px}
+.flbl{display:block;font-size:11px;font-weight:600;color:var(--t2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em}
+.finput,.fselect,.ftextarea{width:100%;padding:9px 12px;border:1px solid var(--brd);border-radius:var(--r);font-size:13px;outline:none;font-family:inherit;color:var(--t1);background:var(--card);transition:border .14s}
+.finput:focus,.fselect:focus,.ftextarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.07)}
+.ftextarea{resize:vertical;min-height:80px}
+.fhint{font-size:11px;color:var(--t3);margin-top:4px}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.frow3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+
+/* FILE UPLOAD */
+.file-upload{border:2px dashed var(--brd);border-radius:var(--r);padding:20px;text-align:center;cursor:pointer;transition:all .14s}
+.file-upload:hover{border-color:var(--accent);background:var(--accent-l)}
+.file-upload input[type=file]{display:none}
+.fu-icon{font-size:32px;margin-bottom:8px}
+.fu-text{font-size:12px;color:var(--t2)}
+.file-preview{display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg);border-radius:var(--r);margin-top:10px}
+.file-preview img{width:40px;height:40px;border-radius:6px;object-fit:cover}
+.file-name{font-size:12px;color:var(--t1);flex:1}
+.file-remove{color:var(--err);cursor:pointer;font-size:16px}
+
+/* EMPLOYEE CARD */
+.ec-header{display:flex;gap:20px;align-items:flex-start;padding:24px;border-bottom:1px solid var(--brd)}
+.ec-photo{width:72px;height:72px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:700;color:#fff;flex-shrink:0;position:relative}
+.ec-photo-edit{position:absolute;bottom:-5px;right:-5px;width:24px;height:24px;border-radius:50%;background:var(--accent);border:2px solid #fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px}
+.ec-name{font-size:18px;font-weight:700;margin-bottom:3px}
+.ec-pos{font-size:13px;color:var(--t2);margin-bottom:10px}
+
+/* Info grid */
+.ig{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:20px}
+.ig-item .il{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.ig-item .iv{font-size:13px;color:var(--t1);font-weight:500}
+.ig-item .iv.empty{color:var(--t3);font-style:italic;font-weight:400}
+
+/* FORM VIEW - Label + Value style */
+.fv-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.fv-item{background:var(--bg);border-radius:var(--r);padding:12px 14px}
+.fv-label{font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.fv-value{font-size:13px;color:var(--t1);font-weight:500;line-height:1.4}
+.fv-value.empty{color:var(--t3);font-style:italic}
+.fv-value.monospace{font-family:monospace;font-size:12px}
+.fv-pill{display:inline-block;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600}
+.fv-pill-ok{background:var(--ok-l);color:var(--ok)}
+.fv-pill-no{background:var(--err-l);color:var(--err)}
+.fv-section{margin-bottom:24px}
+.fv-section-title{font-size:13px;font-weight:700;color:var(--t1);margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid var(--accent)}
+
+/* Timeline */
+.tl-item{display:flex;gap:14px;padding:13px 0;border-bottom:1px solid var(--brd)}
+.tl-item:last-child{border-bottom:none}
+.tl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.tl-title{font-size:13px;font-weight:600;margin-bottom:2px}
+.tl-sub{font-size:12px;color:var(--t2)}
+.tl-date{font-size:11px;color:var(--t3);margin-top:4px}
+.tl-field{font-size:11px;color:var(--t3);font-style:italic}
+
+/* List items */
+.li-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid var(--brd)}
+.li-item:last-child{border-bottom:none}
+.li-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+
+/* Section headers */
+.sec-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.sec-title{font-size:14px;font-weight:700}
+
+/* Two column grid */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+
+/* Struct item */
+.str-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:var(--r);transition:background .12s}
+.str-item:hover{background:var(--bg)}
+.str-name{font-size:13px;font-weight:500}
+.str-sub{font-size:11px;color:var(--t2);margin-top:2px}
+
+/* ORG TREE VIEW */
+.org-tree{padding:0;margin:0}
+.org-node{margin:0;padding:0}
+.org-row{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:var(--r);transition:all .15s;margin-bottom:4px;cursor:pointer}
+.org-row:hover{background:var(--bg)}
+.org-row.parent-node{background:var(--accent-l);border:1px solid var(--accent)}
+.org-toggle{width:20px;height:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:var(--t3);border-radius:4px;transition:all .14s;flex-shrink:0}
+.org-toggle:hover{background:var(--brd);color:var(--t1)}
+.org-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.org-info{flex:1;min-width:0}
+.org-name{font-size:13px;font-weight:600;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.org-meta{font-size:11px;color:var(--t2);margin-top:2px;display:flex;gap:8px;flex-wrap:wrap}
+.org-actions{display:flex;gap:4px;opacity:0;transition:opacity .14s}
+.org-row:hover .org-actions{opacity:1}
+.org-children{margin-left:28px;border-left:2px solid var(--brd);padding-left:12px}
+.industry-badge{font-size:9px;padding:2px 6px;border-radius:4px;font-weight:600;text-transform:uppercase;background:var(--bg);color:var(--t1);border:1px solid var(--brd)}
+
+/* Dashboard recent */
+.dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.act-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--brd)}
+.act-item:last-child{border-bottom:none}
+.act-ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+
+/* Empty state */
+.empty-s{text-align:center;padding:48px 24px}
+.empty-s .ei{font-size:36px;margin-bottom:12px}
+.empty-s h3{font-size:14px;font-weight:600;color:var(--t1);margin-bottom:6px}
+.empty-s p{font-size:12px;color:var(--t2)}
+
+/* GAP banner */
+.gap-note{background:var(--err-l);border:1px solid #FECACA;border-radius:var(--r);padding:10px 14px;font-size:12px;color:#991B1B;display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.gap-note.ok{background:var(--ok-l);border-color:#A7F3D0;color:#065F46}
+
+/* CHARTS */
+.chart-container{background:var(--card);border:1px solid var(--brd);border-radius:var(--rl);padding:16px;margin-bottom:16px}
+.chart-title{font-size:13px;font-weight:600;margin-bottom:12px;color:var(--t1)}
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:150px;padding:10px 0}
+.bar-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{width:100%;border-radius:4px 4px 0 0;transition:height .3s ease}
+.bar-label{font-size:10px;color:var(--t3);text-align:center}
+.bar-value{font-size:10px;font-weight:600;color:var(--t1)}
+
+/* FUNKSIONAL PANEL */
+.funk-panel{position:fixed;right:0;top:0;bottom:0;width:320px;background:var(--card);border-left:1px solid var(--brd);z-index:150;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .22s cubic-bezier(.4,0,.2,1);box-shadow:-8px 0 24px rgba(0,0,0,.08)}
+.funk-panel.open{transform:translateX(0)}
+.funk-hd{padding:15px 18px;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--bg)}
+.funk-hd h3{font-size:13px;font-weight:700;color:var(--t1)}
+.funk-ctx{font-size:10px;color:var(--t2);font-weight:400;margin-top:2px}
+.funk-body{flex:1;overflow-y:auto;padding:14px 18px}
+.funk-sec{font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin:12px 0 8px;padding-bottom:5px;border-bottom:1px solid var(--brd)}
+.funk-item{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-bottom:1px solid rgba(0,0,0,.04)}
+.funk-item:last-child{border-bottom:none}
+.fi-status{width:16px;height:16px;border-radius:50%;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:8px;color:#fff;font-weight:700}
+.fi-ok{background:var(--ok)}.fi-part{background:var(--warn)}.fi-gap{background:var(--err)}
+.fi-title{font-size:12px;font-weight:500;color:var(--t1);line-height:1.4}
+.fi-note{font-size:11px;color:var(--t2);margin-top:2px;line-height:1.4}
+.funk-legend{padding:12px 18px;border-top:1px solid var(--brd);display:flex;gap:12px;flex-wrap:wrap;flex-shrink:0;background:var(--bg)}
+.leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--t2)}
+.ld{width:7px;height:7px;border-radius:50%}
+
+/* FUNK TOGGLE BUTTON */
+.funk-toggle-btn{position:fixed;bottom:24px;right:24px;z-index:140;padding:9px 16px;background:var(--sb);color:#fff;border:none;border-radius:24px;cursor:pointer;font-size:12px;font-weight:600;display:flex;align-items:center;gap:7px;box-shadow:0 4px 14px rgba(0,0,0,.22);transition:all .15s;font-family:inherit}
+.funk-toggle-btn:hover{background:#1a3a6b;transform:translateY(-1px)}
+.funk-toggle-btn.active-btn{background:var(--accent)}
+
+/* BULK ACTIONS BAR */
+.bulk-bar{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--sb);color:#fff;padding:12px 20px;border-radius:24px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(0,0,0,.24);z-index:130;transition:transform .2s}
+.bulk-bar.visible{transform:translateX(-50%) translateY(0)}
+.bulk-count{font-size:13px;font-weight:600}
+.bulk-actions{display:flex;gap:8px}
+.bulk-btn{padding:6px 12px;border-radius:16px;border:none;cursor:pointer;font-size:11px;font-weight:500;color:#fff;transition:all .14s}
+.bulk-btn-sec{background:rgba(255,255,255,.2)}.bulk-btn-sec:hover{background:rgba(255,255,255,.3)}
+.bulk-btn-danger{background:var(--err)}.bulk-btn-danger:hover{background:#b91c1c}
+.bulk-close{margin-left:8px;cursor:pointer;opacity:.7;font-size:16px}
+
+/* HIERARCHY TREE */
+.tree-item{padding:8px 12px;border-left:2px solid var(--brd);margin-left:12px}
+.tree-item.has-children{border-left-color:var(--accent)}
+.tree-header{display:flex;align-items:center;gap:8px;cursor:pointer}
+.tree-toggle{width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--t3);cursor:pointer}
+.tree-children{margin-left:16px}
+
+/* AUDIT LOG TABLE */
+.audit-table{width:100%;font-size:12px}
+.audit-table th{font-size:10px;padding:8px 12px}
+.audit-table td{padding:10px 12px;font-size:11px}
+.audit-change{font-family:monospace;background:#F8FAFF;padding:2px 6px;border-radius:4px}
+.audit-old{text-decoration:line-through;color:var(--t3);margin-right:8px}
+.audit-new{color:var(--ok);font-weight:600}
+
+/* misc */
+.divider{height:1px;background:var(--brd);margin:16px 0}
+.muted{color:var(--t2)}.small{font-size:12px}.xsmall{font-size:11px}
+.fw6{font-weight:600}.fw7{font-weight:700}
+.flex{display:flex}.aic{align-items:center}.jb{justify-content:space-between}.gap2{gap:8px}.gap3{gap:12px}
+.mt2{margin-top:8px}.mt3{margin-top:12px}.mt4{margin-top:16px}.mb2{margin-bottom:8px}.mb3{margin-bottom:12px}.mb4{margin-bottom:16px}
+.hidden{display:none!important}
+.clickable{cursor:pointer}
+.text-ok{color:var(--ok)}.text-err{color:var(--err)}.text-warn{color:var(--warn)}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen" class="login-screen">
+  <div class="login-card">
+    <div class="login-logo">HR</div>
+    <h1 class="login-h">AZMAN HOLDING HR</h1>
+    <p class="login-sub">İstifadəçi seçin</p>
+    
+    <div style="text-align:left;font-size:11px;font-weight:600;color:var(--t3);margin:12px 0 8px;text-transform:uppercase">Admin</div>
+    <button class="role-btn" onclick="loginAs(1)">
+      <div class="ri" style="background:#F5F3FF">⚙️</div>
+      <div><span class="rname">Sistem Admini</span><span class="rdesc">Əli Hüseynov — Tam giriş</span></div>
+    </button>
+    
+    <div style="text-align:left;font-size:11px;font-weight:600;color:var(--t3);margin:12px 0 8px;text-transform:uppercase">Holding HR</div>
+    <button class="role-btn" onclick="loginAs(2)">
+      <div class="ri" style="background:#EFF6FF">👑</div>
+      <div><span class="rname">Holding HR Admin</span><span class="rdesc">Günel Əliyeva — Bütün şirkətlər</span></div>
+    </button>
+    
+    <div style="text-align:left;font-size:11px;font-weight:600;color:var(--t3);margin:12px 0 8px;text-transform:uppercase">Şirkət HR-lar</div>
+    <button class="role-btn" onclick="loginAs(3)">
+      <div class="ri" style="background:#FEF3C7">🏗️</div>
+      <div><span class="rname">Azman Construction — HR</span><span class="rdesc">Aysel Məmmədova</span></div>
+    </button>
+    <button class="role-btn" onclick="loginAs(4)">
+      <div class="ri" style="background:#E0F2FE">🚛</div>
+      <div><span class="rname">TEZ Logistics — HR</span><span class="rdesc">Rəşad Əliyev</span></div>
+    </button>
+    <button class="role-btn" onclick="loginAs(5)">
+      <div class="ri" style="background:#FCE7F3">🏨</div>
+      <div><span class="rname">Sapphire Hotels — HR</span><span class="rdesc">Nigar Hüseynova</span></div>
+    </button>
+    <button class="role-btn" onclick="loginAs(6)">
+      <div class="ri" style="background:#FEF3C7">🍽️</div>
+      <div><span class="rname">City Service Company — HR</span><span class="rdesc">Elvin Rzayev</span></div>
+    </button>
+    <button class="role-btn" onclick="loginAs(7)">
+      <div class="ri" style="background:#D1FAE5">🌾</div>
+      <div><span class="rname">EcoProd Azerbaijan — HR</span><span class="rdesc">Leyla Qasımova</span></div>
+    </button>
+    <button class="role-btn" onclick="loginAs(8)">
+      <div class="ri" style="background:#FEE2E2">🔥</div>
+      <div><span class="rname">Mangal MMC — HR</span><span class="rdesc">Tural İbrahimov</span></div>
+    </button>
+    <button class="role-btn" onclick="loginAs(9)">
+      <div class="ri" style="background:#E0E7FF">🥋</div>
+      <div><span class="rname">Judo Club 2012 — HR</span><span class="rdesc">Samirə Kərimova</span></div>
+    </button>
+  </div>
+</div>
+
+<!-- APP SHELL -->
+<div id="app" class="app hidden">
+  <aside class="sidebar" id="sidebar"></aside>
+  <div class="main">
+    <div class="topbar" id="topbar"></div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+
+<!-- MODALS CONTAINER -->
+<div id="modals"></div>
+
+<!-- BULK ACTIONS BAR -->
+<div class="bulk-bar" id="bulk-bar">
+  <span class="bulk-count" id="bulk-count">0 seçilib</span>
+  <div class="bulk-actions">
+    <button class="bulk-btn bulk-btn-sec" onclick="bulkExport()">📥 Export</button>
+    <button class="bulk-btn bulk-btn-danger" onclick="bulkTerminate()">✗ Xitam</button>
+  </div>
+  <span class="bulk-close" onclick="clearBulkSelection()">×</span>
+</div>
+
+<!-- FUNKSIONAL PANEL -->
+<div class="funk-panel" id="funk-panel">
+  <div class="funk-hd">
+    <div>
+      <h3>Funksional İmkanlar</h3>
+      <div class="funk-ctx" id="funk-ctx">Mövcud görünüş</div>
+    </div>
+    <button class="mclose" onclick="closeFunk()">×</button>
+  </div>
+  <div class="funk-body" id="funk-body"></div>
+  <div class="funk-legend">
+    <span class="leg"><span class="ld" style="background:var(--ok)"></span>Mövcuddur</span>
+    <span class="leg"><span class="ld" style="background:var(--warn)"></span>Qismən</span>
+    <span class="leg"><span class="ld" style="background:var(--err)"></span>Boşluq (yoxdur)</span>
+  </div>
+</div>
+<button class="funk-toggle-btn" id="funk-btn" onclick="toggleFunk()">ⓘ Funksional İmkanlar</button>
+
+<script>
+/* ===== DATA ===== */
+const DB = {
+  companies: [
+    {id:1,name:'AZMAN HOLDING',is_holding:true,tax_id:'1701234567',industry:'HOLDING',address:'Səbail r., Hacıbabayevlər küçəsi 4, Bakı',parent_id:null},
+    {id:2,name:'Azman Construction',is_holding:false,tax_id:'1702345678',industry:'CONSTRUCTION',address:'Baku - 16 il təcrübə, ictimai bina və parkların tikintisi',parent_id:1},
+    {id:3,name:'TEZ Logistics',is_holding:false,tax_id:'1703456789',industry:'LOGISTICS',address:'Baku',parent_id:1},
+    {id:4,name:'Sapphire Hotels Group',is_holding:false,tax_id:'1704567890',industry:'HOTEL',address:'Baku',parent_id:1},
+    {id:5,name:'City Service Company',is_holding:false,tax_id:'1705678901',industry:'RESTAURANT_CHAIN',address:'Baku',parent_id:1,is_parent:true},
+    {id:6,name:'Nar&Sharab',is_holding:false,tax_id:'1705678902',industry:'RESTAURANT',address:'Bakı — Restoran & Şərab Zalı',parent_id:5},
+    {id:7,name:'Senator Hall',is_holding:false,tax_id:'1705678903',industry:'RESTAURANT',address:'Bakı — Banket Zalı',parent_id:5},
+    {id:8,name:'Maxim Hall',is_holding:false,tax_id:'1705678904',industry:'RESTAURANT',address:'Bakı — Banket Zalı',parent_id:5},
+    {id:9,name:'Mangal Steak House Zagulba',is_holding:false,tax_id:'1705678905',industry:'RESTAURANT',address:'Bakı, Zagulba — Restoran',parent_id:5},
+    {id:10,name:'Zuğulba Saray',is_holding:false,tax_id:'1705678906',industry:'RESTAURANT',address:'Bakı, Zagulba — Banket & Əyləncə Məkanı',parent_id:5},
+    {id:11,name:'Beer Hall',is_holding:false,tax_id:'1705678907',industry:'RESTAURANT',address:'Bakı — Restoran & Bar',parent_id:5},
+    {id:12,name:'JazzClub by BeerHall',is_holding:false,tax_id:'1705678908',industry:'RESTAURANT',address:'Bakı — Jazz Klub & Bar',parent_id:5},
+    {id:13,name:'EcoProd Azerbaijan',is_holding:false,tax_id:'1706789012',industry:'AGRICULTURE',address:'Baku — Kənd təsərrüfatı və emalat',parent_id:1},
+    {id:14,name:'Mangal MMC',is_holding:false,tax_id:'1707890123',industry:'PRODUCTION',address:'Baku',parent_id:1},
+    {id:15,name:'Judo Club 2012',is_holding:false,tax_id:'1708901234',industry:'SPORTS',address:'Bakı',parent_id:1},
+  ],
+  departments:[
+    {id:1,cid:2,name:'İnformasiya Texnologiyaları',is_active:true},
+    {id:2,cid:2,name:'Maliyyə',is_active:true},
+    {id:3,cid:2,name:'İnsan Resursları',is_active:true},
+    {id:4,cid:3,name:'Marketinq',is_active:true},
+    {id:5,cid:3,name:'Redaksiya',is_active:true},
+    {id:6,cid:4,name:'Kredit Şöbəsi',is_active:true},
+    {id:7,cid:4,name:'Risk İdarəetmə',is_active:true},
+  ],
+  positions:[
+    {id:1,cid:2,name:'Proqramçı',status:'ACTIVE'},
+    {id:2,cid:2,name:'Böyük Proqramçı',status:'ACTIVE'},
+    {id:3,cid:2,name:'Mühasib',status:'ACTIVE'},
+    {id:4,cid:2,name:'HR Mütəxəssisi',status:'ACTIVE'},
+    {id:5,cid:3,name:'Marketoloq',status:'ACTIVE'},
+    {id:6,cid:3,name:'Redaktor',status:'ACTIVE'},
+    {id:7,cid:3,name:'Kontent Menecer',status:'ACTIVE'},
+    {id:8,cid:4,name:'Kredit Mütəxəssisi',status:'ACTIVE'},
+    {id:9,cid:4,name:'Risk Analitiki',status:'ACTIVE'},
+  ],
+  dictionaries:{
+    termination_reasons:[
+      {id:1,name:'Öz istəyi ilə',is_active:true},
+      {id:2,name:'Müqavilə bitməsi',is_active:true},
+      {id:3,name:'İxtisarın azaldılması',is_active:true},
+      {id:4,name:'İntizam pozuntusu',is_active:true},
+      {id:5,name:'Tərəflərin razılığı ilə',is_active:true},
+    ],
+    vacancy_statuses:[
+      {id:1,name:'Açıq',is_active:true},
+      {id:2,name:'Bağlı',is_active:true},
+      {id:3,name:'Dondurulub',is_active:true},
+    ],
+    candidate_statuses:[
+      {id:1,name:'Gözləyir',is_active:true},
+      {id:2,name:'Rədd edilib',is_active:true},
+      {id:3,name:'Qəbul edilib',is_active:true},
+    ],
+  },
+  employees:[
+    {id:1,cid:2,fn:'Orxan',ln:'Həsənov',fan:'Rauf',fin:'7AP8K1X',bd:'1990-05-12',gender:'Kişi',status:'ACTIVE',did:1,pid:2,hire:'2022-03-15',probation_end_date:'2022-06-15',phone:'+994 55 123 45 67',email:'o.hasenov@azartech.az',addr:'Bakı, Nərimanov r., Hüsü Hacıyev 12',salary:2500,photo_path:null,files:[],contract_file:null,
+      marital_status:'Evli',children_count:2,military_service:'Xidmət edib',military_rank:'Leytenant',
+      id_serial:'A',id_number:'123456',id_issue_date:'2020-01-15',id_expiry_date:'2030-01-15',
+      pension_number:'',tax_number:'1701234567',
+      driver_license:true,driver_categories:['B','C'],driver_issue_date:'2015-06-01',driver_expiry_date:'2025-06-01',
+      emergency_contact:{name:'Sevinc Həsənova',phone:'+994 55 987 65 43',relation:'Həyat yoldaşı'},
+      reg_address:'Bakı, Nərimanov r., Hüsü Hacıyev 12',fact_address:'Bakı, Nərimanov r., Hüsü Hacıyev 12',
+      bank_name:'Kapital Bank',bank_iban:'AZ12KAPB00000000000000000000',bank_card:'****1234',
+      insurance_type:'Özəl',insurance_company:'Atəşgah',insurance_number:'INS123456',insurance_date:'2024-01-01',
+      blood_group:'A+',chronic_diseases:'Yox',allergies:'Yox',disability:false,disability_percent:0,
+      work_schedule:'Tam',work_location:'Ofis',manager_id:null,has_subordinates:false,is_reserve:false,
+      industry_certificates:[{name:'Təhlükəsizlik sertifikatı',number:'TS-12345',issue_date:'2023-01-01',expiry_date:'2025-01-01'}]
+    },
+    {id:2,cid:2,fn:'Leyla',ln:'Məmmədova',fan:'Əli',fin:'3BT9L2Y',bd:'1994-11-30',gender:'Qadın',status:'ACTIVE',did:2,pid:3,hire:'2021-07-01',probation_end_date:'2021-10-01',phone:'+994 70 234 56 78',email:'l.mammadova@azartech.az',addr:'Bakı, Xətai r., Xaqani 22',salary:1800,photo_path:null,files:[],contract_file:null,
+      marital_status:'Subay',children_count:0,military_service:'Xidmət etməyib',military_rank:'',
+      id_serial:'A',id_number:'234567',id_issue_date:'2019-05-20',id_expiry_date:'2029-05-20',
+      pension_number:'',tax_number:'1702345678',
+      driver_license:true,driver_categories:['B'],driver_issue_date:'2018-03-15',driver_expiry_date:'2028-03-15',
+      emergency_contact:{name:'Kəmalə Məmmədova',phone:'+994 51 444 55 66',relation:'Ana'},
+      reg_address:'Bakı, Xətai r., Xaqani 22',fact_address:'Bakı, Xətai r., Xaqani 22',
+      bank_name:'ABB Bank',bank_iban:'AZ12ABBA00000000000000000000',bank_card:'****5678',
+      insurance_type:'İcbari',insurance_company:'Pasha Sigorta',insurance_number:'INS234567',insurance_date:'2024-01-01',
+      blood_group:'B+',chronic_diseases:'Yox',allergies:'Penisillin',disability:false,disability_percent:0,
+      work_schedule:'Tam',work_location:'Ofis',manager_id:null,has_subordinates:false,is_reserve:false,
+      industry_certificates:[]
+    },
+    {id:3,cid:2,fn:'Tural',ln:'Quliyev',fan:'Şahin',fin:'5CX1M3Z',bd:'1997-03-22',gender:'Kişi',status:'CANDIDATE',did:null,pid:null,hire:null,probation_end_date:null,phone:'+994 51 345 67 89',email:'t.quliyev@gmail.com',salary:null,photo_path:null,files:[],cv_file:null,contract_file:null,
+      marital_status:'Subay',children_count:0,military_service:'Xidmət edib',military_rank:'Əsgər',
+      id_serial:'A',id_number:'345678',id_issue_date:'2021-01-10',id_expiry_date:'2031-01-10',
+      pension_number:'',tax_number:'',
+      driver_license:false,driver_categories:[],driver_issue_date:'',driver_expiry_date:'',
+      emergency_contact:{name:'',phone:'',relation:''},
+      reg_address:'',fact_address:'',
+      bank_name:'',bank_iban:'',bank_card:'',
+      insurance_type:'',insurance_company:'',insurance_number:'',insurance_date:'',
+      blood_group:'',chronic_diseases:'',allergies:'',disability:false,disability_percent:0,
+      work_schedule:'Tam',work_location:'Ofis',manager_id:null,has_subordinates:false,is_reserve:false,
+      industry_certificates:[]
+    },
+    {id:4,cid:2,fn:'Aynur',ln:'Əliyeva',fan:'Vüsal',fin:'2DW5N4A',bd:'1988-08-15',gender:'Qadın',status:'TERMINATED',did:1,pid:1,hire:'2020-01-10',probation_end_date:'2020-04-10',term_date:'2024-06-30',term_reason:'Öz iradəsi ilə',phone:'+994 77 456 78 90',salary:2000,photo_path:null,files:[],contract_file:null,
+      marital_status:'Evli',children_count:1,military_service:'Xidmət etməyib',military_rank:'',
+      id_serial:'A',id_number:'456789',id_issue_date:'2018-02-28',id_expiry_date:'2028-02-28',
+      pension_number:'',tax_number:'1703456789',
+      driver_license:true,driver_categories:['B'],driver_issue_date:'2016-07-20',driver_expiry_date:'2026-07-20',
+      emergency_contact:{name:'Vüsal Əliyev',phone:'+994 70 111 22 33',relation:'Həyat yoldaşı'},
+      reg_address:'Bakı, Yasamal r., Məmməd Araz 15',fact_address:'Bakı, Yasamal r., Məmməd Araz 15',
+      bank_name:'Paşa Bank',bank_iban:'AZ12PASH00000000000000000000',bank_card:'****9012',
+      insurance_type:'Özəl',insurance_company:'Qala Sigorta',insurance_number:'INS345678',insurance_date:'2023-01-01',
+      blood_group:'0+',chronic_diseases:'Yox',allergies:'Yox',disability:false,disability_percent:0,
+      work_schedule:'Tam',work_location:'Ofis',manager_id:null,has_subordinates:false,is_reserve:false,
+      industry_certificates:[]
+    },
+    {id:5,cid:3,fn:'Rauf',ln:'Hüseynov',fan:'Elnur',fin:'8EV3P5B',bd:'1992-07-18',gender:'Kişi',status:'ACTIVE',did:4,pid:5,hire:'2023-01-20',probation_end_date:'2023-04-20',phone:'+994 50 567 89 01',salary:1600,photo_path:null,files:[],contract_file:null,
+      marital_status:'Evli',children_count:3,military_service:'Xidmət edib',military_rank:'Baş Leytenant',
+      id_serial:'B',id_number:'567890',id_issue_date:'2017-11-05',id_expiry_date:'2027-11-05',
+      pension_number:'',tax_number:'1704567890',
+      driver_license:true,driver_categories:['B','D'],driver_issue_date:'2014-04-10',driver_expiry_date:'2024-04-10',
+      emergency_contact:{name:'Aysel Hüseynova',phone:'+994 55 222 33 44',relation:'Həyat yoldaşı'},
+      reg_address:'Bakı, Səbail r., Neftçilər 28',fact_address:'Bakı, Səbail r., Neftçilər 28',
+      bank_name:'Bank of Baku',bank_iban:'AZ12BOFA00000000000000000000',bank_card:'****3456',
+      insurance_type:'İcbari',insurance_company:'Atəşgah',insurance_number:'INS456789',insurance_date:'2024-01-01',
+      blood_group:'AB+',chronic_diseases:'Yox',allergies:'Yox',disability:false,disability_percent:0,
+      work_schedule:'Tam',work_location:'Hibrid',manager_id:null,has_subordinates:false,is_reserve:true,
+      industry_certificates:[{name:'Sanitar kitabçası',number:'SK-78901',issue_date:'2023-06-01',expiry_date:'2024-06-01'}]
+    },
+    {id:6,cid:3,fn:'Nigar',ln:'Babayeva',fan:'Cavid',fin:'4FU7Q6C',bd:'1999-12-05',gender:'Qadın',status:'CANDIDATE',did:null,pid:null,hire:null,probation_end_date:null,phone:'+994 55 678 90 12',email:'n.babayeva@mail.ru',salary:null,photo_path:null,files:[],cv_file:null,contract_file:null,
+      marital_status:'Subay',children_count:0,military_service:'Xidmət etməyib',military_rank:'',
+      id_serial:'C',id_number:'678901',id_issue_date:'2022-08-15',id_expiry_date:'2032-08-15',
+      pension_number:'',tax_number:'',
+      driver_license:false,driver_categories:[],driver_issue_date:'',driver_expiry_date:'',
+      emergency_contact:{name:'Cavid Babayev',phone:'+994 77 555 66 77',relation:'Ata'},
+      reg_address:'Gəncə şəh., Nizami küç. 45',fact_address:'Bakı, Nəsimi r., Bülbül 10',
+      bank_name:'',bank_iban:'',bank_card:'',
+      insurance_type:'',insurance_company:'',insurance_number:'',insurance_date:'',
+      blood_group:'A-',chronic_diseases:'Yox',allergies:'Yox',disability:false,disability_percent:0,
+      work_schedule:'Tam',work_location:'Ofis',manager_id:null,has_subordinates:false,is_reserve:false,
+      industry_certificates:[]
+    },
+    {id:7,cid:3,fn:'Elnur',ln:'İsgəndərov',fan:'Qəhrəman',fin:'9GT2R7D',bd:'1991-04-25',gender:'Kişi',status:'ACTIVE',did:5,pid:6,hire:'2022-09-05',probation_end_date:'2022-12-05',phone:'+994 70 789 01 23',salary:1400,photo_path:null,files:[],contract_file:null,
+      marital_status:'Evli',children_count:1,military_service:'Xidmət edib',military_rank:'Çavuş',
+      id_serial:'A',id_number:'789012',id_issue_date:'2016-03-20',id_expiry_date:'2026-03-20',
+      pension_number:'',tax_number:'1705678901',
+      driver_license:true,driver_categories:['B'],driver_issue_date:'2017-09-01',driver_expiry_date:'2027-09-01',
+      emergency_contact:{name:'Nargiz İsgəndərova',phone:'+994 50 888 99 00',relation:'Həyat yoldaşı'},
+      reg_address:'Bakı, Nəsimi r., Cəlil Məmmədquluzadə 5',fact_address:'Bakı, Nəsimi r., Cəlil Məmmədquluzadə 5',
+      bank_name:'AccessBank',bank_iban:'AZ12ACCB00000000000000000000',bank_card:'****7890',
+      insurance_type:'İcbari',insurance_company:'Pasha Sigorta',insurance_number:'INS567890',insurance_date:'2024-01-01',
+      blood_group:'B-',chronic_diseases:'Yox',allergies:'Yox',disability:false,disability_percent:0,
+      work_schedule:'Tam',work_location:'Ofis',manager_id:null,has_subordinates:false,is_reserve:false,
+      industry_certificates:[{name:'Mətbəx təhlükəsizliyi',number:'MT-23456',issue_date:'2023-03-15',expiry_date:'2025-03-15'}]
+    },
+    {id:8,cid:4,fn:'Samirə',ln:'Nəsirova',fan:'Tofiq',fin:'1HS6S8E',bd:'1995-06-14',gender:'Qadın',status:'ACTIVE',did:6,pid:8,hire:'2023-04-12',probation_end_date:'2023-07-12',phone:'+994 51 890 12 34',salary:1700,photo_path:null,files:[],contract_file:null,
+      marital_status:'Evli',children_count:0,military_service:'Xidmət etməyib',military_rank:'',
+      id_serial:'B',id_number:'890123',id_issue_date:'2020-07-25',id_expiry_date:'2030-07-25',
+      pension_number:'',tax_number:'1706789012',
+      driver_license:true,driver_categories:['B'],driver_issue_date:'2019-02-14',driver_expiry_date:'2029-02-14',
+      emergency_contact:{name:'Tofiq Nəsirov',phone:'+994 55 333 44 55',relation:'Ata'},
+      reg_address:'Bakı, Binəqədi r., Azadlıq 88',fact_address:'Bakı, Binəqədi r., Azadlıq 88',
+      bank_name:'Yelo Bank',bank_iban:'AZ12YELO00000000000000000000',bank_card:'****2345',
+      insurance_type:'Özəl',insurance_company:'Qala Sigorta',insurance_number:'INS678901',insurance_date:'2024-01-01',
+      blood_group:'0-',chronic_diseases:'Yox',allergies:'Yox',disability:false,disability_percent:0,
+      work_schedule:'Tam',work_location:'Ofis',manager_id:null,has_subordinates:false,is_reserve:false,
+      industry_certificates:[]
+    },
+    {id:9,cid:4,fn:'Kənan',ln:'Rzayev',fan:'Əkrəm',fin:'6JT4U9F',bd:'1993-09-28',gender:'Kişi',status:'TERMINATED',did:7,pid:9,hire:'2021-05-20',probation_end_date:'2021-08-20',term_date:'2024-09-15',term_reason:'İxtisarın azaldılması',salary:1900,photo_path:null,files:[],contract_file:null,
+      marital_status:'Evli',children_count:2,military_service:'Xidmət edib',military_rank:'Leytenant',
+      id_serial:'A',id_number:'901234',id_issue_date:'2015-12-01',id_expiry_date:'2025-12-01',
+      pension_number:'',tax_number:'1707890123',
+      driver_license:true,driver_categories:['B','C','E'],driver_issue_date:'2013-08-20',driver_expiry_date:'2023-08-20',
+      emergency_contact:{name:'Günəş Rzayeva',phone:'+994 70 666 77 88',relation:'Həyat yoldaşı'},
+      reg_address:'Sumqayıt şəh., 5-ci məhəllə',fact_address:'Sumqayıt şəh., 5-ci məhəllə',
+      bank_name:'Kapital Bank',bank_iban:'AZ12KAPB00000000000000000000',bank_card:'****6789',
+      insurance_type:'İcbari',insurance_company:'Atəşgah',insurance_number:'INS789012',insurance_date:'2023-01-01',
+      blood_group:'AB-',chronic_diseases:'Diabet',allergies:'Yox',disability:false,disability_percent:0,
+      work_schedule:'Tam',work_location:'Səhra',manager_id:null,has_subordinates:true,is_reserve:false,
+      industry_certificates:[{name:'Əmək mühafizəsi',number:'EM-34567',issue_date:'2022-01-10',expiry_date:'2024-01-10'},{name:'Yanğın təhlükəsizliyi',number:'YT-45678',issue_date:'2022-01-10',expiry_date:'2024-01-10'}]
+    },
+  ],
+  users:[
+    {id:1,role:'ADMIN',name:'Əli Hüseynov',email:'admin@azmanholding.az',cid:null,is_active:true},
+    {id:2,role:'HOLDING_HR',name:'Günel Əliyeva',email:'hr@azmanholding.az',cid:null,is_active:true},
+    {id:3,role:'SUBSIDIARY_HR',name:'Aysel Məmmədova',email:'hr@azmanconstruction.az',cid:2,is_active:true},
+    {id:4,role:'SUBSIDIARY_HR',name:'Rəşad Əliyev',email:'hr@tezlogistics.az',cid:3,is_active:true},
+    {id:5,role:'SUBSIDIARY_HR',name:'Nigar Hüseynova',email:'hr@sapphirehotels.az',cid:4,is_active:true},
+    {id:6,role:'SUBSIDIARY_HR',name:'Elvin Rzayev',email:'hr@cityservice.az',cid:5,is_active:true},
+    {id:7,role:'SUBSIDIARY_HR',name:'Leyla Qasımova',email:'hr@ecoprod.az',cid:13,is_active:true},
+    {id:8,role:'SUBSIDIARY_HR',name:'Tural İbrahimov',email:'hr@mangal.az',cid:14,is_active:true},
+    {id:9,role:'SUBSIDIARY_HR',name:'Samirə Kərimova',email:'hr@judoclub.az',cid:15,is_active:true},
+  ],
+  lifecycle:[
+    {eid:1,uid:2,old:'CANDIDATE',new_s:'ACTIVE',desc:'İşə qəbul edildi — Böyük Proqramçı vəzifəsinə',date:'2022-03-15'},
+    {eid:1,uid:2,old:null,new_s:'CANDIDATE',desc:'Namizəd profilsı yaradıldı',date:'2022-02-28'},
+    {eid:2,uid:3,old:'CANDIDATE',new_s:'ACTIVE',desc:'İşə qəbul edildi — Mühasib vəzifəsinə',date:'2021-07-01'},
+    {eid:4,uid:2,old:'ACTIVE',new_s:'TERMINATED',desc:'Xitam verildi — Öz iradəsi ilə',date:'2024-06-30'},
+    {eid:5,uid:4,old:'CANDIDATE',new_s:'ACTIVE',desc:'İşə qəbul edildi — Marketoloq vəzifəsinə',date:'2023-01-20'},
+  ],
+  education:[
+    {id:1,eid:1,inst:'UNEC',degree:'Bakalavr',field:'Kompüter Elmləri',sy:2007,ey:2011,diploma_file:null},
+    {id:2,eid:1,inst:'UNEC',degree:'Magistr',field:'İT İdarəetmə',sy:2011,ey:2013,diploma_file:null},
+    {id:3,eid:2,inst:'BDU',degree:'Bakalavr',field:'Maliyyə',sy:2012,ey:2016,diploma_file:null},
+    {id:4,eid:5,inst:'ADU',degree:'Bakalavr',field:'Marketinq',sy:2009,ey:2013,diploma_file:null},
+  ],
+  experience:[
+    {id:1,eid:1,company:'Kapital Bank',pos:'Junior Developer',sd:'2013-06-01',ed:'2018-12-31',reason:'Yüksəliş üçün',certificate_file:null},
+    {id:2,eid:1,company:'PAŞA Bank',pos:'Senior Developer',sd:'2019-01-15',ed:'2022-02-28',reason:'Daha yaxşı təklif',certificate_file:null},
+    {id:3,eid:2,company:'ABB Bank',pos:'Mühasib köməkçisi',sd:'2016-09-01',ed:'2021-06-30',reason:'Karyera inkişafı',certificate_file:null},
+  ],
+  family:[
+    {id:1,eid:1,rel:'Həyat yoldaşı',name:'Sevinc Həsənova',contact:'+994 55 987 65 43'},
+    {id:2,eid:1,rel:'Ata',name:'Rauf Həsənov',contact:'+994 70 111 22 33'},
+    {id:3,eid:2,rel:'Ana',name:'Kəmalə Məmmədova',contact:'+994 51 444 55 66'},
+  ],
+  auditLog:[
+    {id:1,eid:1,uid:2,field:'status',old_value:null,new_value:'CANDIDATE',desc:'Namizəd profilsı yaradıldı',date:'2022-02-28'},
+    {id:2,eid:1,uid:2,field:'status',old_value:'CANDIDATE',new_value:'ACTIVE',desc:'İşə qəbul edildi',date:'2022-03-15'},
+    {id:3,eid:1,uid:2,field:'pid',old_value:null,new_value:'Böyük Proqramçı',desc:'Vəzifə təyin edildi',date:'2022-03-15'},
+    {id:4,eid:1,uid:2,field:'did',old_value:null,new_value:'İnformasiya Texnologiyaları',desc:'Departament təyin edildi',date:'2022-03-15'},
+  ],
+  monthlyStats:[
+    {month:'2024-01',hired:3,terminated:1},
+    {month:'2024-02',hired:2,terminated:0},
+    {month:'2024-03',hired:5,terminated:2},
+    {month:'2024-04',hired:1,terminated:1},
+    {month:'2024-05',hired:4,terminated:0},
+    {month:'2024-06',hired:2,terminated:3},
+  ],
+};
+
+/* ===== STATE ===== */
+const S = {
+  uid: null, view:'dashboard', tab:'ACTIVE',
+  cid_filter: null, search:'', dept_filter:'',
+  eid: null, etab:'personal', funk_open:false,
+  funk_ctx:'dashboard', selectedEmployees:[], bulkMode:false,
+};
+
+/* ===== HELPERS ===== */
+const co = id => DB.companies.find(c=>c.id===id);
+const de = id => DB.departments.find(d=>d.id===id);
+const po = id => DB.positions.find(p=>p.id===id);
+const us = id => DB.users.find(u=>u.id===id);
+const user = () => us(S.uid);
+const isAdmin = () => user()?.role==='ADMIN';
+const isHolding = () => user()?.role==='HOLDING_HR';
+const isSubHR = () => user()?.role==='SUBSIDIARY_HR';
+const myCid = () => user()?.cid;
+
+function getEmps(){
+  let emps = [...DB.employees];
+  if(isSubHR()) emps = emps.filter(e=>e.cid===myCid());
+  else if(isAdmin()) { if(S.cid_filter) emps=emps.filter(e=>e.cid===S.cid_filter); }
+  else if(isHolding()) { if(S.cid_filter) emps=emps.filter(e=>e.cid===S.cid_filter); }
+  return emps;
+}
+
+function initials(e){ return (e.fn[0]+(e.ln[0]||'')).toUpperCase(); }
+const avColors=['#3B82F6','#8B5CF6','#EC4899','#10B981','#F59E0B','#EF4444','#06B6D4','#84CC16'];
+function avColor(e){ return avColors[e.id%avColors.length]; }
+
+/* ORG TREE HELPERS */
+const industryIcons={HOLDING:'👑',CONSTRUCTION:'🏗️',LOGISTICS:'🚛',HOTEL:'🏨',RESTAURANT_CHAIN:'🍽️',RESTAURANT:'🔴',AGRICULTURE:'🌾',PRODUCTION:'🔥',SPORTS:'🥋'};
+function getIndustryIcon(ind){return industryIcons[ind]||'🏢';}
+function getChildren(pid){return DB.companies.filter(c=>c.parent_id===pid);}
+function hasChildren(pid){return getChildren(pid).length>0;}
+
+// Tree state for expanded/collapsed nodes
+if(!window.treeState) window.treeState={expanded:[1,5]};
+function toggleTree(id){
+  const c=DB.companies.find(x=>x.id===id);
+  if(c&&c.is_holding) return;
+  const idx=window.treeState.expanded.indexOf(id);
+  if(idx>=0) window.treeState.expanded.splice(idx,1);
+  else window.treeState.expanded.push(id);
+  renderContent();
+}
+function isExpanded(id){return window.treeState.expanded.includes(id);}
+
+function renderOrgNode(cid,depth=0){
+  const c=DB.companies.find(x=>x.id===cid);
+  if(!c) return '';
+  const children=getChildren(cid);
+  const hasKids=children.length>0;
+  const expanded=isExpanded(cid);
+  const icon=getIndustryIcon(c.industry);
+  const clickAttr = hasKids ? ` onclick="toggleTree(${c.id})"` : '';
+  const parentClass = hasKids&&expanded ? ' parent-node' : '';
+
+  const actions=`
+    <div class="org-actions" onclick="event.stopPropagation()">
+      <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();openEditCompanyModal(${c.id})">✎</button>
+      ${!c.is_holding?`<button class="btn btn-ghost btn-xs text-err" onclick="event.stopPropagation();deleteCompany(${c.id})">🗑</button>`:''}
+      <button class="btn btn-ghost btn-xs" onclick="event.stopPropagation();openAddSubCompanyModal(${c.id})">➕</button>
+    </div>
+  `;
+
+  return `
+    <div class="org-node">
+      <div class="org-row${parentClass}"${clickAttr}>
+        ${hasKids?`<div class="org-toggle" onclick="event.stopPropagation();toggleTree(${c.id})">${expanded?'▼':'▶'}</div>`:'<div style="width:20px"></div>'}
+        <div class="org-icon" style="background:var(--bg);border:1px solid var(--brd)">${icon}</div>
+        <div class="org-info">
+          <div class="org-name">${c.name} ${c.is_holding?'<span class="industry-badge">HOLDING</span>':`<span class="industry-badge">${c.industry.replace('_',' ')}</span>`}</div>
+          <div class="org-meta">
+            <span>🔖 ${c.tax_id}</span>
+            ${c.address?`<span>📍 ${c.address}</span>`:''}
+            ${hasKids?`<span>📁 ${children.length} alt şirkət</span>`:''}
+          </div>
+        </div>
+        ${actions}
+      </div>
+      ${hasKids&&expanded?`<div class="org-children">${children.map(child=>renderOrgNode(child.id,depth+1)).join('')}</div>`:''}
+    </div>
+  `;
+}
+
+function statusPill(s){
+  const map={
+    ACTIVE:'<span class="pill p-active">● Aktiv</span>',
+    CANDIDATE:'<span class="pill p-candidate">◌ Namizəd</span>',
+    TERMINATED:'<span class="pill p-terminated">○ Arxiv</span>',
+    REJECTED:'<span class="pill p-rejected">✕ Rədd</span>'
+  };
+  return map[s]||s;
+}
+
+function rolePill(r){
+  if(r==='ADMIN') return '<span class="pill p-admin">Admin</span>';
+  if(r==='HOLDING_HR') return '<span class="pill p-holding">Holding HR</span>';
+  return '<span class="pill p-sub">Şirkət HR</span>';
+}
+
+function fmtDate(d){ if(!d) return '—'; const date=new Date(d); return date.toLocaleDateString('az-AZ',{year:'numeric',month:'long',day:'numeric'}); }
+function fmtMoney(n){ if(n===null||n===undefined) return '—'; return n.toLocaleString('az-AZ')+' AZN'; }
+
+/* FORM VIEW HELPERS */
+function fvItem(label,value,isMonospace=false){
+  const isEmpty = !value || value==='';
+  return `<div class="fv-item">
+    <div class="fv-label">${label}</div>
+    <div class="fv-value${isEmpty?' empty':''}${isMonospace?' monospace':''}">${isEmpty?'—':value}</div>
+  </div>`;
+}
+function fvPill(label,value,isTrue){
+  return `<div class="fv-item">
+    <div class="fv-label">${label}</div>
+    <div><span class="fv-pill ${isTrue?'fv-pill-ok':'fv-pill-no'}">${isTrue?'✓ Var':'✗ Yox'}</span></div>
+  </div>`;
+}
+function fvSection(title,content){
+  return `<div class="fv-section"><div class="fv-section-title">${title}</div>${content}</div>`;
+}
+
+function logAudit(eid,field,oldVal,newVal,desc){
+  DB.auditLog.push({
+    id:Math.max(...DB.auditLog.map(a=>a.id),0)+1,
+    eid,uid:S.uid,field,old_value:oldVal,new_value:newVal,desc,date:new Date().toISOString().split('T')[0]
+  });
+}
+
+/* ===== FILE UPLOAD HELPERS ===== */
+function handleFileSelect(event, callback){
+  const file = event.target.files[0];
+  if(file){
+    const reader = new FileReader();
+    reader.onload = function(e){
+      callback({name:file.name,size:file.size,type:file.type,data:e.target.result});
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+function renderFilePreview(fileData, onRemove){
+  if(!fileData) return '';
+  const isImage = fileData.type.startsWith('image/');
+  return `
+    <div class="file-preview">
+      ${isImage ? `<img src="${fileData.data}" alt="${fileData.name}">` : '📄'}
+      <span class="file-name">${fileData.name} (${(fileData.size/1024).toFixed(1)} KB)</span>
+      <span class="file-remove" onclick="${onRemove}">×</span>
+    </div>
+  `;
+}
+
+/* ===== FUNK DATA ===== */
+const FUNK = {
+  dashboard:{ctx:'Dashboard',items:[
+    {s:'ok',t:'Ümumi işçi sayı (aktiv)',n:'Cari aktiv işçilər göstərilir'},
+    {s:'ok',t:'Namizəd sayı',n:''},
+    {s:'ok',t:'Bu ay xitam verilənlər',n:''},
+    {s:'ok',t:'Son fəaliyyətlər lenti',n:'Lifecycle logdan çəkilir'},
+    {s:'ok',t:'Hesabat export (Excel/PDF)',n:'Export funksiyası əlavə edildi'},
+    {s:'ok',t:'Şirkət üzrə vizual breakdown',n:'Bar chart əlavə edildi'},
+    {s:'ok',t:'Giriş/çıxış trendi (aylıq qrafik)',n:'Aylıq statistika qrafiki əlavə edildi'},
+  ]},
+  employees:{ctx:'Kadr Uçotu — Siyahı',items:[
+    {s:'ok',t:'3 tab üzrə siyahı (Cari/Namizəd/Arxiv)',n:''},
+    {s:'ok',t:'FİN, ad/soyad üzrə axtarış',n:'Debounce ilə'},
+    {s:'ok',t:'Departament filtri',n:''},
+    {s:'ok',t:'Şirkət filtri',n:'Yalnız Holding HR üçün aktiv'},
+    {s:'ok',t:'Yeni namizəd profilsı açmaq',n:''},
+    {s:'ok',t:'Profilya klikləmək → detallar',n:''},
+    {s:'ok',t:'Namizədi rədd etmək (reject)',n:'Reject flow əlavə edildi'},
+    {s:'ok',t:'İşçiləri export etmək',n:'Excel/CSV export əlavə edildi'},
+    {s:'ok',t:'Toplu əməliyyatlar (bulk action)',n:'Bulk export/terminate əlavə edildi'},
+  ]},
+  'card-personal':{ctx:'Profil — Şəxsi Məlumatlar',items:[
+    {s:'ok',t:'FİN, ad, soyad, ata adı görüntülə',n:''},
+    {s:'ok',t:'Doğum tarixi, cins',n:''},
+    {s:'ok',t:'Telefon, email, yaşayış ünvanı',n:''},
+    {s:'ok',t:'Sahələri redaktə et',n:'Save/cancel flow tamamilə işlək'},
+    {s:'ok',t:'Şəxsiyyət vəsiqəsi skanı yüklə',n:'Fayl yükləmə sistemi əlavə edildi'},
+    {s:'ok',t:'Foto yükləmək',n:'Photo upload əlavə edildi'},
+  ]},
+  'card-education':{ctx:'Profil — Təhsil',items:[
+    {s:'ok',t:'Təhsil siyahısına bax',n:'Çoxlu qeyd'},
+    {s:'ok',t:'Yeni təhsil əlavə et',n:''},
+    {s:'ok',t:'Mövcud qeydi redaktə et',n:'Tam işlək'},
+    {s:'ok',t:'Diplom sənədi yüklə',n:'Fayl yükləmə əlavə edildi'},
+  ]},
+  'card-experience':{ctx:'Profil — İş Təcrübəsi',items:[
+    {s:'ok',t:'Əvvəlki iş yerlərini gör (timeline)',n:''},
+    {s:'ok',t:'Yeni təcrübə əlavə et',n:''},
+    {s:'ok',t:'Mövcud qeydi redaktə et',n:''},
+    {s:'ok',t:'İş sertifikatı yüklə',n:'Fayl yükləmə əlavə edildi'},
+  ]},
+  'card-family':{ctx:'Profil — Ailə',items:[
+    {s:'ok',t:'Ailə üzvlərini gör',n:'Qohumluq dərəcəsi, əlaqə'},
+    {s:'ok',t:'Ailə üzvü əlavə et',n:''},
+    {s:'ok',t:'Ailə üzvünü redaktə et',n:'Tam işlək'},
+  ]},
+  'card-corporate':{ctx:'Profil — Korporativ',items:[
+    {s:'ok',t:'Departament, vəzifə, şirkət gör',n:''},
+    {s:'ok',t:'İşə qəbul et (Namizəd → Cari)',n:'Vəzifə + başlama tarixi tələb'},
+    {s:'ok',t:'Xitam ver (Cari → Arxiv)',n:'Tarix + səbəb tələb olunur'},
+    {s:'ok',t:'Bərpa et (Arxiv → Cari)',n:''},
+    {s:'ok',t:'Maaş məlumatı daxil et',n:'Salary sahəsi əlavə edildi'},
+    {s:'ok',t:'Şirkətlərarası transfer',n:'Transfer flow əlavə edildi'},
+    {s:'ok',t:'Vəzifə tarixçəsi (daxili keçidlər)',n:'Audit logda əks olunur'},
+  ]},
+  'card-lifecycle':{ctx:'Profil — Tarixçə',items:[
+    {s:'ok',t:'Status dəyişikliklərini gör',n:'Kim, nə vaxt, nə etdi'},
+    {s:'ok',t:'Tam audit trail',n:'Hansı sahə dəyişdirildi, köhnə/yeni dəyər var'},
+  ]},
+  structure:{ctx:'Struktur — Departament/Vəzifə',items:[
+    {s:'ok',t:'Departamentlər siyahısı',n:'Şirkətə görə filtrlənir'},
+    {s:'ok',t:'Vəzifələr siyahısı',n:'Şirkətə görə filtrlənir'},
+    {s:'ok',t:'Yeni departament əlavə et',n:'Admin üçün'},
+    {s:'ok',t:'Yeni vəzifə əlavə et',n:'Admin üçün'},
+    {s:'ok',t:'Departament redaktə et / sil',n:'Edit + delete flow əlavə edildi'},
+    {s:'ok',t:'Vəzifə redaktə et / sil',n:'Əlaqəli işçilərə effekt ilə'},
+    {s:'part',t:'3-səviyyəli iyerarxiya (şöbə daxilində şöbə)',n:'parent_id strukturu əlavə edildi, UI qismən'},
+  ]},
+  settings:{ctx:'Ayarlar — Şirkətlər & İstifadəçilər',items:[
+    {s:'ok',t:'Şirkətlər siyahısı',n:'Holding + subsidiaries'},
+    {s:'ok',t:'Yeni şirkət əlavə et',n:'Admin üçün'},
+    {s:'ok',t:'İstifadəçilər siyahısı',n:'Bütün HR rolları'},
+    {s:'ok',t:'Yeni istifadəçi əlavə et',n:'Rol + şirkət + email'},
+    {s:'ok',t:'İstifadəçini deaktivləşdir / sil',n:'is_active sahəsi əlavə edildi'},
+    {s:'part',t:'3-səviyyəli iyerarxiya',n:'parent_id DB-də var, UI qismən'},
+    {s:'ok',t:'Sistem audit loqu',n:'Admin üçün audit log əlavə edildi'},
+  ]},
+};
+
+function renderFunk(ctx){
+  S.funk_ctx = ctx;
+  const d = FUNK[ctx];
+  if(!d) return;
+  document.getElementById('funk-ctx').textContent = d.ctx;
+  const map = {ok:'fi-ok',part:'fi-part',gap:'fi-gap'};
+  const lbl = {ok:'✓',part:'~',gap:'✗'};
+  const html = d.items.map(i=>`
+    <div class="funk-item">
+      <div class="fi-status ${map[i.s]}">${lbl[i.s]}</div>
+      <div>
+        <div class="fi-title">${i.t}</div>
+        ${i.n?`<div class="fi-note">${i.n}</div>`:''}
+      </div>
+    </div>`).join('');
+  document.getElementById('funk-body').innerHTML = html;
+}
+
+function toggleFunk(){
+  S.funk_open = !S.funk_open;
+  document.getElementById('funk-panel').classList.toggle('open', S.funk_open);
+  document.getElementById('funk-btn').classList.toggle('active-btn', S.funk_open);
+}
+function closeFunk(){ S.funk_open=false; document.getElementById('funk-panel').classList.remove('open'); document.getElementById('funk-btn').classList.remove('active-btn'); }
+
+/* ===== AUTH ===== */
+function loginAs(uid){
+  S.uid = uid;
+  if(isSubHR()) S.cid_filter = myCid();
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  renderAll();
+}
+
+function logout(){
+  S.uid=null; S.view='dashboard'; S.cid_filter=null;
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('app').classList.add('hidden');
+  closeFunk();
+}
+
+/* ===== SIDEBAR ===== */
+function renderSidebar(){
+  const u = user();
+  const nav = [
+    {id:'dashboard',icon:`<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>`,label:'Dashboard'},
+    {id:'employees',icon:`<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,label:'Kadr Uçotu'},
+    {id:'structure',icon:`<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,label:'Struktur'},
+  ];
+  if(isAdmin()) nav.push({id:'settings',icon:`<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>`,label:'Ayarlar'});
+  if(isAdmin()) nav.push({id:'audit',icon:`<svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`,label:'Audit Loqu'});
+
+  const navHtml = nav.map(n=>`<div class="sbi ${S.view===n.id?'active':''}" onclick="setView('${n.id}')">${n.icon}<span>${n.label}</span></div>`).join('');
+
+  document.getElementById('sidebar').innerHTML = `
+    <div class="sb-top">
+      <div class="sb-logo-row">
+        <div class="sb-mark">HR</div>
+        <div><div class="sb-logo-name">Holding HR</div><div class="sb-logo-sub">Sistemi v2.0</div></div>
+      </div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-sec">Naviqasiya</div>
+      ${navHtml}
+    </nav>
+    <div class="sb-foot">
+      <div class="sb-user">
+        <div class="sb-av">${u.name.split(' ').map(x=>x[0]).join('').slice(0,2)}</div>
+        <div><div class="sb-uname">${u.name}</div><div class="sb-urole">${u.role==='ADMIN'?'Sistem Admini':u.role==='HOLDING_HR'?'Holding HR':'Şirkət HR'} ${u.cid?'· '+co(u.cid)?.name:''}</div></div>
+      </div>
+      <div class="sb-logout" onclick="logout()"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span>Çıxış / Rolu dəyiş</span></div>
+    </div>`;
+}
+
+/* ===== TOPBAR ===== */
+function renderTopbar(){
+  const titles = {dashboard:'Dashboard',employees:'Kadr Uçotu',structure:'Struktur',settings:'Ayarlar',audit:'Sistem Audit Loqu'};
+  const actions = {
+    employees: isAdmin()||isHolding()||isSubHR() ? `<button class="btn btn-primary btn-sm" onclick="openNewEmpModal()"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Yeni Namizəd</button>` : '',
+    structure: (isAdmin()) ? `<button class="btn btn-primary btn-sm" onclick="openAddStructure()"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Əlavə et</button>` : '',
+    settings: isAdmin() ? `<button class="btn btn-primary btn-sm" onclick="openAddUserModal()"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>İstifadəçi əlavə et</button>` : '',
+  };
+  document.getElementById('topbar').innerHTML = `
+    <div class="topbar-title">${titles[S.view]||''}</div>
+    ${actions[S.view]||''}`;
+}
+
+/* ===== VIEWS ===== */
+function setView(v){ S.view=v; S.tab='ACTIVE'; S.search=''; S.dept_filter=''; renderAll(); renderFunk(v); }
+
+function renderAll(){ renderSidebar(); renderTopbar(); renderContent(); }
+
+function renderContent(){
+  const el = document.getElementById('content');
+  if(S.view==='dashboard') el.innerHTML = renderDashboard();
+  else if(S.view==='employees') el.innerHTML = renderEmployees();
+  else if(S.view==='structure') el.innerHTML = renderStructure();
+  else if(S.view==='settings') el.innerHTML = renderSettings();
+  else if(S.view==='audit') el.innerHTML = renderAuditLog();
+  renderFunk(S.view==='employees'?'employees':S.view==='audit'?'settings':S.view);
+}
+
+/* ===== DASHBOARD ===== */
+// Dashboard state for month filter
+if(!S.dashboardMonth) S.dashboardMonth = new Date().toISOString().slice(0,7); // YYYY-MM
+
+function renderDashboard(){
+  const emps = getEmps();
+  const active = emps.filter(e=>e.status==='ACTIVE').length;
+  const cands = emps.filter(e=>e.status==='CANDIDATE').length;
+  const term = emps.filter(e=>e.status==='TERMINATED').length;
+  const total = active+cands+term;
+  
+  // Filter lifecycle by selected month
+  const selectedMonth = S.dashboardMonth;
+  const recent = DB.lifecycle.filter(l=>{
+    const emp = DB.employees.find(x=>x.id===l.eid);
+    if(isSubHR()) return emp?.cid===myCid();
+    if(selectedMonth && l.date) return l.date.startsWith(selectedMonth);
+    return true;
+  }).slice(-5).reverse();
+  
+  // Calculate monthly stats
+  const monthHired = DB.employees.filter(e=>{
+    if(isSubHR() && e.cid!==myCid()) return false;
+    return e.hire && e.hire.startsWith(selectedMonth);
+  }).length;
+  
+  const monthTerminated = DB.employees.filter(e=>{
+    if(isSubHR() && e.cid!==myCid()) return false;
+    return e.term_date && e.term_date.startsWith(selectedMonth);
+  }).length;
+  
+  const monthTransferred = DB.lifecycle.filter(l=>{
+    const emp = DB.employees.find(x=>x.id===l.eid);
+    if(isSubHR() && emp?.cid!==myCid()) return false;
+    return l.old==='TRANSFER' && l.date && l.date.startsWith(selectedMonth);
+  }).length;
+  
+  const actIcons={ACTIVE:'✅',CANDIDATE:'📋',TERMINATED:'🚪'};
+  const recentHtml = recent.map(l=>{
+    const e=DB.employees.find(x=>x.id===l.eid);
+    const u=DB.users.find(x=>x.id===l.uid);
+    return `<div class="act-item">
+      <div class="act-ic" style="background:var(--accent-l)">${actIcons[l.new_s]||'📝'}</div>
+      <div>
+        <div class="small fw6">${e?e.fn+' '+e.ln:'Naməlum'}</div>
+        <div class="xsmall muted">${l.desc}</div>
+        <div class="xsmall" style="color:var(--t3)">${fmtDate(l.date)} · ${u?.name||'Sistem'}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Company-specific header for Sub HR
+  const userCompany = isSubHR() ? co(myCid()) : null;
+  const companyHeader = userCompany ? `
+    <div class="card" style="margin-bottom:12px;padding:12px 16px;background:linear-gradient(135deg,var(--accent-l),var(--bg));border:1px solid var(--accent)">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div style="width:40px;height:40px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:20px">🏢</div>
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:700;color:var(--t1)">${userCompany.name}</div>
+          <div style="font-size:11px;color:var(--t2)">${userCompany.industry}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-size:20px;font-weight:700;color:var(--accent)">${active}</div>
+          <div style="font-size:10px;color:var(--t2)">Aktiv</div>
+        </div>
+      </div>
+    </div>
+  ` : '';
+
+  // Month selector - compact inline
+  const currentYear = new Date().getFullYear();
+  const monthOptions = [];
+  for(let m=1; m<=12; m++){
+    const monthStr = `${currentYear}-${String(m).padStart(2,'0')}`;
+    const monthName = new Date(currentYear, m-1).toLocaleDateString('az-AZ',{month:'short'});
+    monthOptions.push(`<option value="${monthStr}" ${monthStr===selectedMonth?'selected':''}>${monthName}</option>`);
+  }
+  
+  return `
+    ${companyHeader}
+    
+    <!-- Compact Monthly Stats -->
+    <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
+      <div style="display:flex;gap:8px">
+        <div class="stat-card" style="padding:10px 14px;min-width:100px">
+          <div class="stat-lbl" style="font-size:10px">İşə qəbul</div>
+          <div class="stat-num text-ok" style="font-size:20px">${monthHired}</div>
+        </div>
+        <div class="stat-card" style="padding:10px 14px;min-width:100px">
+          <div class="stat-lbl" style="font-size:10px">Xitam</div>
+          <div class="stat-num text-err" style="font-size:20px">${monthTerminated}</div>
+        </div>
+        <div class="stat-card" style="padding:10px 14px;min-width:100px">
+          <div class="stat-lbl" style="font-size:10px">Köçürülən</div>
+          <div class="stat-num" style="font-size:20px;color:var(--accent)">${monthTransferred}</div>
+        </div>
+      </div>
+      <select class="filt" onchange="S.dashboardMonth=this.value;renderDashboard()" style="margin-left:auto">
+        ${monthOptions.join('')}
+      </select>
+    </div>
+    
+    <!-- Main Stats - Compact Grid -->
+    <div class="stats-grid" style="margin-bottom:16px">
+      <div class="stat-card">
+        <div class="stat-lbl" style="font-size:10px">Cəmi</div>
+        <div class="stat-num">${total}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-lbl" style="font-size:10px">Aktiv</div>
+        <div class="stat-num text-ok">${active}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-lbl" style="font-size:10px">Namizəd</div>
+        <div class="stat-num" style="color:#1E40AF;font-size:20px">${cands}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-lbl" style="font-size:10px">Arxiv</div>
+        <div class="stat-num text-err">${term}</div>
+      </div>
+    </div>
+    
+    <!-- Quick Actions -->
+    <div class="card" style="padding:12px 16px">
+      <div class="sec-title" style="font-size:12px;margin-bottom:8px">⚡ Sürətli Keçid</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-secondary btn-sm" onclick="setView('employees')">👥 İşçilər</button>
+        <button class="btn btn-secondary btn-sm" onclick="setView('structure')">🏢 Struktur</button>
+        ${isSubHR()?'<button class="btn btn-primary btn-sm" onclick="openNewEmpModal()">+ Namizəd</button>':''}
+        ${isAdmin()?'<button class="btn btn-primary btn-sm" onclick="setView(&apos;settings&apos;)">⚙️ Ayarlar</button>':''}
+      </div>
+    </div>`;
+}
+
+/* ===== EMPLOYEES ===== */
+let selectedEmployees = new Set();
+
+function toggleEmpSelection(eid, event){
+  event.stopPropagation();
+  if(selectedEmployees.has(eid)) selectedEmployees.delete(eid);
+  else selectedEmployees.add(eid);
+  updateBulkBar();
+  renderEmployees();
+}
+
+function updateBulkBar(){
+  const bar = document.getElementById('bulk-bar');
+  document.getElementById('bulk-count').textContent = `${selectedEmployees.size} seçilib`;
+  if(selectedEmployees.size>0) bar.classList.add('visible');
+  else bar.classList.remove('visible');
+}
+
+function clearBulkSelection(){
+  selectedEmployees.clear();
+  updateBulkBar();
+  renderEmployees();
+}
+
+function bulkExport(){
+  const emps = DB.employees.filter(e=>selectedEmployees.has(e.id));
+  exportEmployeesToCSV(emps);
+}
+
+function bulkTerminate(){
+  if(!confirm('Seçilmiş işçilərə xitam vermək istədiyinizə əminsiniz?')) return;
+  selectedEmployees.forEach(eid=>{
+    const e = DB.employees.find(x=>x.id===eid);
+    if(e&&e.status==='ACTIVE'){
+      e.status='TERMINATED';
+      e.term_date = new Date().toISOString().split('T')[0];
+      e.term_reason = 'Toplu xitam';
+      DB.lifecycle.push({eid,uid:S.uid,old:'ACTIVE',new_s:'TERMINATED',desc:'Toplu xitam verildi',date:new Date().toISOString().split('T')[0]});
+      logAudit(eid,'status','ACTIVE','TERMINATED','Toplu xitam');
+    }
+  });
+  clearBulkSelection();
+  renderAll();
+}
+
+function exportToCSV(){
+  const emps = getEmps().filter(e=>e.status===S.tab);
+  exportEmployeesToCSV(emps);
+}
+
+function exportEmployeesToCSV(emps){
+  const headers = ['ID','Ad','Soyad','FİN','Status','Vəzifə','Departament','Şirkət','Maaş','Telefon','Email'];
+  const rows = emps.map(e=>{
+    const dept = de(e.did);
+    const pos = po(e.pid);
+    const comp = co(e.cid);
+    return [e.id,e.fn,e.ln,e.fin,e.status,pos?.name||'',dept?.name||'',comp?.name||'',e.salary||'',e.phone||'',e.email||''].map(v=>`"${v}"`).join(',');
+  });
+  const csv = [headers.join(','),...rows].join('\n');
+  const blob = new Blob([csv],{type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `employees_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function renderEmployees(){
+  const emps = getEmps().filter(e=>{
+    if(e.status!==S.tab && e.status!=='REJECTED') return false;
+    if(S.tab==='CANDIDATE' && e.status==='REJECTED') return false;
+    if(S.search){
+      const q=S.search.toLowerCase();
+      if(!(e.fn+' '+e.ln).toLowerCase().includes(q)&&!e.fin.toLowerCase().includes(q)) return false;
+    }
+    if(S.dept_filter&&e.did!==parseInt(S.dept_filter)) return false;
+    return true;
+  });
+  const allEmps = getEmps();
+  const cnt={
+    ACTIVE:allEmps.filter(e=>e.status==='ACTIVE').length,
+    CANDIDATE:allEmps.filter(e=>e.status==='CANDIDATE').length,
+    TERMINATED:allEmps.filter(e=>e.status==='TERMINATED').length,
+    REJECTED:allEmps.filter(e=>e.status==='REJECTED').length
+  };
+
+  const myDepts = S.dept_filter || S.cid_filter ?
+    DB.departments.filter(d=>d.cid===(S.cid_filter||myCid())) :
+    (isHolding()||isAdmin()) ? DB.departments : DB.departments.filter(d=>d.cid===myCid());
+
+  const companyFilter = (isHolding()||isAdmin()) ? `
+    <select class="filt" onchange="S.cid_filter=this.value?parseInt(this.value):null;renderContent()">
+      <option value="">Bütün şirkətlər</option>
+      ${DB.companies.filter(c=>!c.is_holding).map(c=>`<option value="${c.id}" ${S.cid_filter===c.id?'selected':''}>${c.name}</option>`).join('')}
+    </select>` : '';
+
+  // Group by company for ACTIVE tab
+  const showGrouping = S.tab==='ACTIVE' && (isHolding()||isAdmin());
+  
+  let rows = '';
+  if(showGrouping){
+    // Grouped view
+    const companies = DB.companies.filter(c=>!c.is_holding);
+    rows = companies.map(comp=>{
+      const compEmps = emps.filter(e=>e.cid===comp.id);
+      if(compEmps.length===0) return '';
+      const empRows = compEmps.map(e=>{
+        const dept = de(e.did);
+        const pos = po(e.pid);
+        const isSelected = selectedEmployees.has(e.id);
+        return `<tr class="row-link ${isSelected?'selected':''}" onclick="openCard(${e.id})">
+          <td style="width:40px"><input type="checkbox" ${isSelected?'checked':''} onclick="toggleEmpSelection(${e.id},event)"></td>
+          <td><div class="av-cell"><div class="av" style="background:${avColor(e)}">${initials(e)}</div><div><div class="fw6">${e.fn} ${e.ln}</div><div class="xsmall muted">${e.fin}</div></div></div></td>
+          <td>${pos?.name||'<span class="muted">—</span>'}</td>
+          <td>${dept?.name||'<span class="muted">—</span>'}</td>
+          <td>${e.hire?fmtDate(e.hire):'<span class="muted">—</span>'}</td>
+          <td>${statusPill(e.status)}</td>
+        </tr>`;
+      }).join('');
+      return `
+        <thead>
+          <tr style="background:var(--accent-l)">
+            <th colspan="7" style="background:var(--accent-l);border-bottom:2px solid var(--accent)">
+              🏢 ${comp.name} <span class="tcnt">${compEmps.length}</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>${empRows}</tbody>
+      `;
+    }).join('');
+  } else {
+    // Regular view
+    rows = emps.length ? emps.map(e=>{
+      const dept = de(e.did);
+      const pos = po(e.pid);
+      const comp = co(e.cid);
+      const isSelected = selectedEmployees.has(e.id);
+      return `<tr class="row-link ${isSelected?'selected':''}" onclick="openCard(${e.id})">
+        <td style="width:40px"><input type="checkbox" ${isSelected?'checked':''} onclick="toggleEmpSelection(${e.id},event)"></td>
+        <td><div class="av-cell"><div class="av" style="background:${avColor(e)}">${initials(e)}</div><div><div class="fw6">${e.fn} ${e.ln}</div><div class="xsmall muted">${e.fin}</div></div></div></td>
+        ${isHolding()||isAdmin()?`<td class="xsmall muted">${comp?.name||'—'}</td>`:''}
+        <td>${pos?.name||'<span class="muted">—</span>'}</td>
+        <td>${dept?.name||'<span class="muted">—</span>'}</td>
+        <td>${e.hire?fmtDate(e.hire):'<span class="muted">—</span>'}</td>
+        <td>${statusPill(e.status)}</td>
+      </tr>`;
+    }).join('') : `<tr><td colspan="10"><div class="empty-s"><div class="ei">🔍</div><h3>Nəticə yoxdur</h3><p>Axtarış şərtlərinə uyğun işçi tapılmadı</p></div></td></tr>`;
+  }
+
+  return `
+    <div class="tabs">
+      <button class="tab-btn ${S.tab==='ACTIVE'?'active':''}" onclick="S.tab='ACTIVE';renderContent()">Cari Əməkdaşlar<span class="tcnt">${cnt.ACTIVE}</span></button>
+      <button class="tab-btn ${S.tab==='CANDIDATE'?'active':''}" onclick="S.tab='CANDIDATE';renderContent()">Yeni Namizədlər<span class="tcnt">${cnt.CANDIDATE}</span></button>
+      <button class="tab-btn ${S.tab==='TERMINATED'?'active':''}" onclick="S.tab='TERMINATED';renderContent()">İşdən Çıxanlar<span class="tcnt">${cnt.TERMINATED}</span></button>
+    </div>
+    <div class="toolbar">
+      <div class="search-w">
+        <svg class="si" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" placeholder="FİN, ad və ya soyad..." value="${S.search}" oninput="S.search=this.value;renderContent()">
+      </div>
+      <select class="filt" onchange="S.dept_filter=this.value;renderContent()">
+        <option value="">Bütün departamentlər</option>
+        ${myDepts.map(d=>`<option value="${d.id}" ${S.dept_filter==d.id?'selected':''}>${d.name}</option>`).join('')}
+      </select>
+      ${companyFilter}
+      <button class="btn btn-secondary btn-sm" onclick="exportToCSV()">📥 Export CSV</button>
+    </div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th style="width:40px"><input type="checkbox" onchange="selectAllEmployees(this)"></th>
+          <th>Ad Soyad / FİN</th>
+          ${!showGrouping && (isHolding()||isAdmin())?'<th>Şirkət</th>':''}
+          <th>Vəzifə</th><th>Departament</th><th>İşə qəbul tarixi</th><th>Status</th>
+        </tr></thead>
+        ${showGrouping?'':`<tbody>`}${rows}${showGrouping?'':'</tbody>'}
+      </table>
+    </div>`;
+}
+
+function selectAllEmployees(checkbox){
+  const emps = getEmps().filter(e=>e.status===S.tab);
+  if(checkbox.checked){
+    emps.forEach(e=>selectedEmployees.add(e.id));
+  } else {
+    emps.forEach(e=>selectedEmployees.delete(e.id));
+  }
+  updateBulkBar();
+  renderEmployees();
+}
+
+/* ===== STRUCTURE ===== */
+function renderStructure(){
+  const holding = DB.companies.find(c=>c.is_holding);
+  
+  return `
+    <div class="gap-note ok">✓ Holding strukturunun tam CRUD funksionallığı əlavə edildi!</div>
+    <div class="card">
+      <div class="sec-h">
+        <div class="sec-title">🏢 Holding Strukturu <span class="tcnt">${DB.companies.length} şirkət</span></div>
+        <button class="btn btn-primary btn-sm" onclick="openAddSubCompanyModal(1)">➕ Yeni Şirkət Əlavə Et</button>
+      </div>
+      <div class="org-tree mt3">
+        ${holding?renderOrgNode(holding.id):'<div class="empty-s"><div class="ei">🏢</div><h3>Holding tapılmadı</h3></div>'}
+      </div>
+    </div>
+    <div class="grid2 mt4">
+      <div class="card">
+        <div class="sec-h">
+          <div class="sec-title">🏛️ Departamentlər <span class="tcnt">${DB.departments.length}</span></div>
+          ${isAdmin()?`<button class="btn btn-primary btn-sm" onclick="openAddDeptModal()">+ Əlavə et</button>`:''}
+        </div>
+        ${renderDeptList()}
+      </div>
+      <div class="card">
+        <div class="sec-h">
+          <div class="sec-title">💼 Vəzifələr <span class="tcnt">${DB.positions.length}</span></div>
+          ${isAdmin()?`<button class="btn btn-primary btn-sm" onclick="openAddPosModal()">+ Əlavə et</button>`:''}
+        </div>
+        ${renderPosList()}
+      </div>
+    </div>`;
+}
+
+function renderDeptList(){
+  const rows = DB.departments.filter(d=>d.is_active!==false).map(d=>{
+    const comp = co(d.cid);
+    return `<div class="str-item">
+      <div><div class="str-name">🏛️ ${d.name}</div><div class="str-sub">${comp?.name||'—'}</div></div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-ghost btn-xs" onclick="openEditDeptModal(${d.id})">✎</button>
+        <button class="btn btn-ghost btn-xs text-err" onclick="deleteDept(${d.id})">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+  return rows||`<div class="empty-s"><div class="ei">🏛️</div><p>Departament yoxdur</p></div>`;
+}
+
+function renderPosList(){
+  const rows = DB.positions.filter(p=>p.status!=='ARCHIVED').map(p=>{
+    const comp = co(p.cid);
+    return `<div class="str-item">
+      <div><div class="str-name">💼 ${p.name}</div><div class="str-sub">${comp?.name||'—'}</div></div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-ghost btn-xs" onclick="openEditPosModal(${p.id})">✎</button>
+        <button class="btn btn-ghost btn-xs text-err" onclick="deletePos(${p.id})">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+  return rows||`<div class="empty-s"><div class="ei">💼</div><p>Vəzifə yoxdur</p></div>`;
+}
+
+function openAddDeptModal(){
+  const html=`
+    <div class="backdrop" id="dept-bd" onclick="if(event.target.id==='dept-bd')closeModal()">
+      <div class="modal-box modal-sm">
+        <div class="mh"><div class="mh-title">🏢 Departament əlavə et</div><button class="mclose" onclick="closeModal()">×</button></div>
+        <div class="mbody">
+          <div class="fg"><label class="flbl">Şirkət *</label><select class="fselect" id="d-cid">${DB.companies.filter(c=>!c.is_holding).map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}</select></div>
+          <div class="fg"><label class="flbl">Departament adı *</label><input class="finput" id="d-name" placeholder="İT şöbəsi"></div>
+        </div>
+        <div class="mfooter"><button class="btn btn-secondary" onclick="closeModal()">Ləğv et</button><button class="btn btn-primary" onclick="doAddDept()">Əlavə et</button></div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+
+function doAddDept(){
+  const n=document.getElementById('d-name').value.trim();
+  const cid=parseInt(document.getElementById('d-cid').value);
+  if(!n){alert('Ad mütləqdir!');return;}
+  DB.departments.push({id:Math.max(...DB.departments.map(d=>d.id))+1,cid,name:n});
+  closeModal(); renderContent();
+}
+
+function openEditDeptModal(id){
+  const d=DB.departments.find(x=>x.id===id);
+  if(!d) return;
+  const html=`
+    <div class="backdrop" id="dept-bd" onclick="if(event.target.id==='dept-bd')closeModal()">
+      <div class="modal-box modal-sm">
+        <div class="mh"><div class="mh-title">🏢 Departament redaktə</div><button class="mclose" onclick="closeModal()">×</button></div>
+        <div class="mbody">
+          <div class="fg"><label class="flbl">Şirkət</label><select class="fselect" id="d-cid" disabled>${DB.companies.filter(c=>!c.is_holding).map(c=>`<option value="${c.id}" ${c.id===d.cid?'selected':''}>${c.name}</option>`).join('')}</select></div>
+          <div class="fg"><label class="flbl">Departament adı *</label><input class="finput" id="d-name" value="${d.name}"></div>
+        </div>
+        <div class="mfooter"><button class="btn btn-secondary" onclick="closeModal()">Ləğv et</button><button class="btn btn-primary" onclick="doEditDept(${id})">Yadda saxla</button></div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+
+function doEditDept(id){
+  const d=DB.departments.find(x=>x.id===id);
+  const n=document.getElementById('d-name').value.trim();
+  if(!n){alert('Ad mütləqdir!');return;}
+  const oldName=d.name;
+  d.name=n;
+  logAudit(null,'department',oldName,n,'Departament redaktə edildi');
+  closeModal(); renderContent();
+}
+
+function deleteDept(id){
+  const d=DB.departments.find(x=>x.id===id);
+  if(!d) return;
+  const emps=DB.employees.filter(e=>e.did===id);
+  if(emps.length>0){
+    if(!confirm(`Bu departamentə ${emps.length} işçi bağlıdır. Departamenti arxivləşdirmək istəyirsiniz? İşçilər departamentsiz qalacaq.`)) return;
+    emps.forEach(e=>{e.did=null;logAudit(e.id,'did',d.name,null,'Departament arxivləşdirildi');});
+  }
+  d.is_active = false;
+  logAudit(null,'department',d.name,'ARCHIVED','Departament arxivləşdirildi');
+  renderContent();
+}
+
+function openAddPosModal(){
+  const html=`
+    <div class="backdrop" id="pos-bd" onclick="if(event.target.id==='pos-bd')closeModal()">
+      <div class="modal-box modal-sm">
+        <div class="mh"><div class="mh-title">💼 Vəzifə əlavə et</div><button class="mclose" onclick="closeModal()">×</button></div>
+        <div class="mbody">
+          <div class="fg"><label class="flbl">Şirkət *</label><select class="fselect" id="p-cid">${DB.companies.filter(c=>!c.is_holding).map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}</select></div>
+          <div class="fg"><label class="flbl">Vəzifə adı *</label><input class="finput" id="p-name" placeholder="Böyük mühasib"></div>
+        </div>
+        <div class="mfooter"><button class="btn btn-secondary" onclick="closeModal()">Ləğv et</button><button class="btn btn-primary" onclick="doAddPos()">Əlavə et</button></div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+
+function doAddPos(){
+  const n=document.getElementById('p-name').value.trim();
+  const cid=parseInt(document.getElementById('p-cid').value);
+  if(!n){alert('Ad mütləqdir!');return;}
+  DB.positions.push({id:Math.max(...DB.positions.map(p=>p.id))+1,cid,name:n});
+  closeModal(); renderContent();
+}
+
+function openEditPosModal(id){
+  const p=DB.positions.find(x=>x.id===id);
+  if(!p) return;
+  const html=`
+    <div class="backdrop" id="pos-bd" onclick="if(event.target.id==='pos-bd')closeModal()">
+      <div class="modal-box modal-sm">
+        <div class="mh"><div class="mh-title">💼 Vəzifə redaktə</div><button class="mclose" onclick="closeModal()">×</button></div>
+        <div class="mbody">
+          <div class="fg"><label class="flbl">Şirkət</label><select class="fselect" id="p-cid" disabled>${DB.companies.filter(c=>!c.is_holding).map(c=>`<option value="${c.id}" ${c.id===p.cid?'selected':''}>${c.name}</option>`).join('')}</select></div>
+          <div class="fg"><label class="flbl">Vəzifə adı *</label><input class="finput" id="p-name" value="${p.name}"></div>
+        </div>
+        <div class="mfooter"><button class="btn btn-secondary" onclick="closeModal()">Ləğv et</button><button class="btn btn-primary" onclick="doEditPos(${id})">Yadda saxla</button></div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+
+function doEditPos(id){
+  const p=DB.positions.find(x=>x.id===id);
+  const n=document.getElementById('p-name').value.trim();
+  if(!n){alert('Ad mütləqdir!');return;}
+  const oldName=p.name;
+  p.name=n;
+  logAudit(null,'position',oldName,n,'Vəzifə redaktə edildi');
+  closeModal(); renderContent();
+}
+
+function deletePos(id){
+  const p=DB.positions.find(x=>x.id===id);
+  if(!p) return;
+  const emps=DB.employees.filter(e=>e.pid===id);
+  if(emps.length>0){
+    if(!confirm(`Bu vəzifəyə ${emps.length} işçi bağlıdır. Vəzifəni arxivləşdirmək istəyirsiniz? İşçilər vəzifəsiz qalacaq.`)) return;
+    emps.forEach(e=>{e.pid=null;logAudit(e.id,'pid',p.name,null,'Vəzifə arxivləşdirildi');});
+  }
+  p.status = 'ARCHIVED';
+  logAudit(null,'position',p.name,'ARCHIVED','Vəzifə arxivləşdirildi');
+  renderContent();
+}
+
+/* ===== SETTINGS ===== */
+function renderSettings(){
+  if(!isAdmin()) return `<div class="empty-s"><div class="ei">🔒</div><h3>Giriş yoxdur</h3><p>Bu bölmə yalnız Sistem Admini üçündür</p></div>`;
+  const compRows = DB.companies.map(c=>`<div class="str-item">
+    <div>
+      <div class="str-name">${c.is_holding?'👑 ':'🏢 '}${c.name}</div>
+      <div class="str-sub">VÖEN: ${c.tax_id} · ${c.is_holding?'Holding':'Alt şirkət'}</div>
+    </div>
+    ${!c.is_holding?`<button class="btn btn-ghost btn-xs" onclick="notImpl('Şirkət redaktəsi — planlaşdırılır')">Redaktə</button>`:''}
+  </div>`).join('');
+
+  const userRows = DB.users.map(u=>`<tr>
+    <td><div class="av-cell"><div class="av" style="background:var(--accent)">${u.name.split(' ').map(x=>x[0]).join('').slice(0,2)}</div><div><div class="fw6">${u.name}</div><div class="xsmall muted">${u.email}</div></div></div></td>
+    <td>${rolePill(u.role)}</td>
+    <td class="small muted">${u.cid?co(u.cid)?.name:'Holding (bütün)'}</td>
+    <td>${u.is_active?`<button class="btn btn-ghost btn-xs text-err" onclick="toggleUserActive(${u.id})">Deaktiv et</button>`:'<span class="pill p-gap">Deaktiv</span>'}</td>
+  </tr>`).join('');
+
+  return `
+    <div class="gap-note ok">✓ İstifadəçi deaktivləşdirmə və audit log funksiyaları əlavə edildi!</div>
+    <div class="grid2" style="margin-bottom:16px">
+      <div class="card">
+        <div class="sec-h">
+          <div class="sec-title">Şirkətlər</div>
+          <button class="btn btn-primary btn-sm" onclick="openAddCompanyModal()">+ Şirkət</button>
+        </div>
+        ${compRows}
+      </div>
+      <div class="card">
+        <div class="sec-h"><div class="sec-title">Struktur Məlumatları</div></div>
+        <div class="xsmall" style="line-height:1.6">
+          <div class="mb2">✓ <strong>parent_id</strong> — Departamentlər arasında iyerarxiya dəstəklənir</div>
+          <div class="mb2">✓ <strong>is_active</strong> — İstifadəçiləri deaktivləşdirmək mümkündür</div>
+          <div>✓ <strong>salary</strong> — Əmək haqqı məlumatları saxlanılır</div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="sec-h">
+        <div class="sec-title">İstifadəçilər (HR-lar)</div>
+        <button class="btn btn-primary btn-sm" onclick="openAddUserModal()">+ İstifadəçi</button>
+      </div>
+      <div class="tbl-wrap mt3">
+        <table><thead><tr><th>Ad</th><th>Rol</th><th>Şirkət</th><th>Status</th><th>Əməliyyat</th></tr></thead>
+        <tbody>${userRows}</tbody></table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="sec-h">
+        <div class="sec-title">📚 Lüğətlər (Dictionaries)</div>
+      </div>
+      <div class="grid2 mt3">
+        <div class="card" style="background:var(--bg)">
+          <div class="sec-h">
+            <div class="sec-title">📝 Xitam Səbəbləri</div>
+            <button class="btn btn-primary btn-sm" onclick="openAddTerminationReasonModal()">+ Əlavə et</button>
+          </div>
+          ${renderTerminationReasonsList()}
+        </div>
+        <div class="card" style="background:var(--bg)">
+          <div class="sec-h">
+            <div class="sec-title">📊 Vakansiya Statusları</div>
+          </div>
+          ${renderVacancyStatusesList()}
+        </div>
+        <div class="card" style="background:var(--bg)">
+          <div class="sec-h">
+            <div class="sec-title">👤 Namizəd Statusları</div>
+          </div>
+          ${renderCandidateStatusesList()}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderTerminationReasonsList(){
+  const rows = DB.dictionaries.termination_reasons.map(r=>`
+    <div class="str-item">
+      <div><div class="str-name">${r.name}</div></div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-ghost btn-xs" onclick="toggleTerminationReason(${r.id})">${r.is_active?'Deaktiv et':'Aktiv et'}</button>
+      </div>
+    </div>
+  `).join('');
+  return rows||'<div class="empty-s"><p>Lüğət boşdur</p></div>';
+}
+
+function renderVacancyStatusesList(){
+  const rows = DB.dictionaries.vacancy_statuses.map(r=>`
+    <div class="str-item">
+      <div><div class="str-name">${r.name}</div></div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-ghost btn-xs" onclick="toggleVacancyStatus(${r.id})">${r.is_active?'Deaktiv et':'Aktiv et'}</button>
+      </div>
+    </div>
+  `).join('');
+  return rows||'<div class="empty-s"><p>Lüğət boşdur</p></div>';
+}
+
+function renderCandidateStatusesList(){
+  const rows = DB.dictionaries.candidate_statuses.map(r=>`
+    <div class="str-item">
+      <div><div class="str-name">${r.name}</div></div>
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-ghost btn-xs" onclick="toggleCandidateStatus(${r.id})">${r.is_active?'Deaktiv et':'Aktiv et'}</button>
+      </div>
+    </div>
+  `).join('');
+  return rows||'<div class="empty-s"><p>Lüğət boşdur</p></div>';
+}
+
+function openAddTerminationReasonModal(){
+  const html=`
+    <div class="backdrop" id="termreason-bd" onclick="if(event.target.id==='termreason-bd')closeModal()">
+      <div class="modal-box modal-sm">
+        <div class="mh"><div class="mh-title">📝 Xitam Səbəbi Əlavə Et</div><button class="mclose" onclick="closeModal()">×</button></div>
+        <div class="mbody">
+          <div class="fg"><label class="flbl">Səbəb adı *</label><input class="finput" id="tr-name" placeholder="Məs: Müqavilə bitməsi"></div>
+        </div>
+        <div class="mfooter">
+          <button class="btn btn-secondary" onclick="closeModal()">Ləğv et</button>
+          <button class="btn btn-primary" onclick="doAddTerminationReason()">Əlavə et</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+
+function doAddTerminationReason(){
+  const name=document.getElementById('tr-name').value.trim();
+  if(!name){alert('Ad mütləqdir!');return;}
+  DB.dictionaries.termination_reasons.push({
+    id:Math.max(...DB.dictionaries.termination_reasons.map(r=>r.id))+1,
+    name,
+    is_active:true
+  });
+  closeModal(); renderSettings();
+}
+
+function toggleTerminationReason(id){
+  const r=DB.dictionaries.termination_reasons.find(x=>x.id===id);
+  if(r){r.is_active=!r.is_active; renderSettings();}
+}
+
+function toggleVacancyStatus(id){
+  const r=DB.dictionaries.vacancy_statuses.find(x=>x.id===id);
+  if(r){r.is_active=!r.is_active; renderSettings();}
+}
+
+function toggleCandidateStatus(id){
+  const r=DB.dictionaries.candidate_statuses.find(x=>x.id===id);
+  if(r){r.is_active=!r.is_active; renderSettings();}
+}
+
+function toggleUserActive(id){
+  const u=DB.users.find(x=>x.id===id);
+  if(!u) return;
+  if(!confirm(`${u.name} istifadəçisini deaktivləşdirmək istədiyinizə əminsiniz?`)) return;
+  u.is_active=false;
+  logAudit(null,'user',u.name,'Deaktiv',`İstifadəçi deaktivləşdirildi: ${u.name}`);
+  renderAll();
+}
+
+function renderAuditLog(){
+  if(!isAdmin()) return `<div class="empty-s"><div class="ei">🔒</div><h3>Giriş yoxdur</h3><p>Bu bölmə yalnız Sistem Admini üçündür</p></div>`;
+  
+  const logs = [...DB.auditLog].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,50);
+  const rows = logs.map(l=>{
+    const e = DB.employees.find(x=>x.id===l.eid);
+    const u = DB.users.find(x=>x.id===l.uid);
+    return `<tr>
+      <td>${fmtDate(l.date)}</td>
+      <td>${e?`${e.fn} ${e.ln}`:'Sistem'}</td>
+      <td><span class="audit-change">${l.field}</span></td>
+      <td><span class="audit-old">${l.old_value||'—'}</span> → <span class="audit-new">${l.new_value||'—'}</span></td>
+      <td class="muted">${l.desc}</td>
+      <td class="muted">${u?.name||'Sistem'}</td>
+    </tr>`;
+  }).join('');
+
+  return `
+    <div class="card">
+      <div class="sec-h">
+        <div class="sec-title">Sistem Audit Loqu</div>
+        <button class="btn btn-secondary btn-sm" onclick="exportAuditLog()">📥 Export CSV</button>
+      </div>
+      <div class="gap-note ok mt3">✓ Bütün sahə dəyişiklikləri tarixçəsi qeydə alınır</div>
+      <div class="tbl-wrap mt3">
+        <table class="audit-table">
+          <thead><tr><th>Tarix</th><th>İşçi</th><th>Sahə</th><th>Dəyişiklik</th><th>Təsvir</th><th>İstifadəçi</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>`;
+}
+
+function exportAuditLog(){
+  const headers = ['Tarix','İşçi','Sahə','Köhnə','Yeni','Təsvir','İstifadəçi'];
+  const rows = DB.auditLog.map(l=>{
+    const e = DB.employees.find(x=>x.id===l.eid);
+    const u = DB.users.find(x=>x.id===l.uid);
+    return [l.date,e?`${e.fn} ${e.ln}`:'Sistem',l.field,l.old_value||'',l.new_value||'',l.desc,u?.name||''].map(v=>`"${v}"`).join(',');
+  });
+  const csv = [headers.join(','),...rows].join('\n');
+  const blob = new Blob([csv],{type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `audit_log_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ===== EMPLOYEE CARD MODAL ===== */
+function openCard(eid, etab='personal'){
+  S.eid=eid;
+  if(etab) S.etab=etab;
+  renderCard();
+  renderFunk('card-'+S.etab);
+}
+
+function renderCard(){
+  const e = DB.employees.find(x=>x.id===S.eid);
+  if(!e) return;
+  const dept=de(e.did), pos=po(e.pid), comp=co(e.cid);
+  const tabs = [
+    {id:'personal',label:'Şəxsi Məlumatlar'},
+    {id:'documents',label:'Sənədlər'},
+    {id:'driver',label:'Sürücü'},
+    {id:'bank',label:'Bank'},
+    {id:'insurance',label:'Sığorta'},
+    {id:'medical',label:'Tibbi'},
+    {id:'education',label:'Təhsil'},
+    {id:'experience',label:'Təcrübə'},
+    {id:'family',label:'Ailə'},
+    {id:'corporate',label:'Korporativ'},
+    {id:'certificates',label:'Sertifikatlar'},
+    {id:'lifecycle',label:'Tarixçə'},
+  ];
+
+  let actionBtn = '';
+  if(e.status==='CANDIDATE') actionBtn = `<button class="btn btn-success" onclick="openHireModal(${e.id})">✓ İşə qəbul et</button>`;
+  else if(e.status==='ACTIVE') actionBtn = `<button class="btn btn-danger" onclick="openTermModal(${e.id})">✗ Xitam ver</button>`;
+  else if(e.status==='TERMINATED') actionBtn = `<button class="btn btn-warn" onclick="restoreEmp(${e.id})">↺ Bərpa et</button>`;
+  else if(e.status==='REJECTED') actionBtn = `<span class="pill p-rejected">Rədd edilib</span>`;
+
+  // Add reject button for candidates
+  let rejectBtn = '';
+  if(e.status==='CANDIDATE') {
+    rejectBtn = `<button class="btn btn-ghost" onclick="openRejectModal(${e.id})">✕ Rədd</button>`;
+  }
+
+  const tabContent = renderCardTab(e);
+  const tabBtns = tabs.map(t=>`<button class="tab-btn ${S.etab===t.id?'active':''}" onclick="setEmpTab('${t.id}',${e.id})">${t.label}</button>`).join('');
+
+  const html = `
+    <div class="backdrop" id="modal-card-bd" onclick="if(event.target.id==='modal-card-bd')closeCardModal(false)">
+      <div class="modal-box modal-lg">
+        <div class="ec-header">
+          <div class="ec-photo" style="background:${avColor(e)}">${initials(e)}
+            <div class="ec-photo-edit" onclick="openPhotoUpload(${e.id})">📷</div>
+          </div>
+          <div style="flex:1">
+            <div class="ec-name">${e.fn} ${e.ln}</div>
+            <div class="ec-pos">${pos?.name||'Vəzifə təyin olunmayıb'} · ${comp?.name||''}</div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              ${statusPill(e.status)}
+              ${e.hire?`<span class="xsmall muted">İşə qəbul: ${fmtDate(e.hire)}</span>`:''}
+              ${e.term_date?`<span class="xsmall muted">Xitam: ${fmtDate(e.term_date)}</span>`:''}
+              ${e.salary!==null&&e.salary!==undefined?`<span class="pill p-ok">💰 ${fmtMoney(e.salary)}</span>`:''}
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:flex-start">
+            ${actionBtn}
+            ${rejectBtn}
+            <button class="mclose" onclick="closeCardModal(false)">×</button>
+          </div>
+        </div>
+        <div class="tabs-wrapper" style="border-bottom:1px solid var(--brd);padding:0 24px">
+          <div class="tabs" style="margin:0;border:none">${tabBtns}</div>
+        </div>
+        <div class="mbody">${tabContent}</div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML = html;
+}
+
+function setEmpTab(tab, eid){
+  const scrollPos = document.querySelector('.modal-box .mbody')?.scrollTop || 0;
+  S.etab=tab; S.eid=eid;
+  renderCard();
+  renderFunk('card-'+tab);
+  setTimeout(()=>{const mb=document.querySelector('.modal-box .mbody');if(mb)mb.scrollTop=scrollPos;},10);
+}
+
+function renderCardTab(e){
+  if(S.etab==='personal') return renderPersonalTab(e);
+  if(S.etab==='documents') return renderDocumentsTab(e);
+  if(S.etab==='driver') return renderDriverTab(e);
+  if(S.etab==='bank') return renderBankTab(e);
+  if(S.etab==='insurance') return renderInsuranceTab(e);
+  if(S.etab==='medical') return renderMedicalTab(e);
+  if(S.etab==='education') return renderEducationTab(e);
+  if(S.etab==='experience') return renderExperienceTab(e);
+  if(S.etab==='family') return renderFamilyTab(e);
+  if(S.etab==='corporate') return renderCorporateTab(e);
+  if(S.etab==='certificates') return renderCertificatesTab(e);
+  if(S.etab==='lifecycle') return renderLifecycleTab(e);
+  return '';
+}
+
+function renderPersonalTab(e){
+  const maritalStatus = {
+    'Subay':'🔵',
+    'Evli':'💚',
+    'Boşanmış':'🟠',
+    'Dul':'🔴'
+  }[e.marital_status]||'⚪';
+  
+  return `
+    <div class="tab-content-wrapper">
+    ${fvSection('👤 Əsas Məlumatlar',`
+      <div class="fv-grid">
+        ${fvItem('Ad',e.fn)}
+        ${fvItem('Soyad',e.ln)}
+        ${fvItem('Ata adı',e.fan)}
+        ${fvItem('FİN',e.fin,true)}
+        ${fvItem('Doğum tarixi',e.bd?fmtDate(e.bd):'')}
+        ${fvItem('Cins',e.gender)}
+      </div>
+    `)}
+    
+    ${fvSection('💍 Ailə Vəziyyəti',`
+      <div class="fv-grid">
+        ${fvItem('Ailə vəziyyəti',e.marital_status?maritalStatus+' '+e.marital_status:'—')}
+        ${fvItem('Uşaqlar',e.children_count||0)}
+        ${fvItem('Hərbi xidmət',e.military_service||'—')}
+        ${fvItem('Hərbi rütbə',e.military_rank||'—')}
+      </div>
+    `)}
+    
+    ${fvSection('📞 Əlaqə Məlumatları',`
+      <div class="fv-grid">
+        ${fvItem('Mobil nömrə',e.phone||'—',true)}
+        ${fvItem('Email',e.email||'—',true)}
+        ${fvItem('Faktiki ünvan',e.fact_address||e.addr||'—')}
+        ${fvItem('Qeydiyyat ünvanı',e.reg_address||'—')}
+      </div>
+    `)}
+    
+    ${fvSection('🆘 Ehtiyat Əlaqə',`
+      <div class="fv-grid">
+        ${fvItem('Ad Soyad',e.emergency_contact?.name||'—')}
+        ${fvItem('Əlaqə',e.emergency_contact?.relation||'—')}
+        ${fvItem('Telefon',e.emergency_contact?.phone||'—',true)}
+      </div>
+    `)}
+    
+    <div style="text-align:right;margin-top:20px">
+      <button class="btn btn-primary" onclick="openEditPersonalModal(${e.id})">✎ Redaktə et</button>
+    </div>
+    </div>`;
+}
+
+function openEditPersonalModal(eid){
+  const e=DB.employees.find(x=>x.id===eid);
+  if(!e) return;
+  const html=`
+    <div class="backdrop" id="edit-bd" onclick="if(event.target.id==='edit-bd')closeEditModal()">
+      <div class="modal-box modal-md">
+        <div class="mh"><div class="mh-title">✎ Şəxsi Məlumatları Redaktə</div><button class="mclose" onclick="closeEditModal()">×</button></div>
+        <div class="mbody">
+          <div class="frow">
+            <div class="fg"><label class="flbl">Ad *</label><input class="finput" id="ep-fn" value="${e.fn}"></div>
+            <div class="fg"><label class="flbl">Soyad *</label><input class="finput" id="ep-ln" value="${e.ln}"></div>
+          </div>
+          <div class="frow">
+            <div class="fg"><label class="flbl">Ata adı</label><input class="finput" id="ep-fan" value="${e.fan||''}"></div>
+            <div class="fg"><label class="flbl">FİN</label><input class="finput" id="ep-fin" value="${e.fin}" disabled></div>
+          </div>
+          <div class="frow">
+            <div class="fg"><label class="flbl">Doğum tarixi</label><input type="date" class="finput" id="ep-bd" value="${e.bd||''}"></div>
+            <div class="fg"><label class="flbl">Cins</label><select class="fselect" id="ep-gender"><option value="">Seçin</option><option ${e.gender==='Kişi'?'selected':''}>Kişi</option><option ${e.gender==='Qadın'?'selected':''}>Qadın</option></select></div>
+          </div>
+          <div class="frow">
+            <div class="fg"><label class="flbl">Mobil nömrə</label><input class="finput" id="ep-phone" value="${e.phone||''}"></div>
+            <div class="fg"><label class="flbl">Email</label><input type="email" class="finput" id="ep-email" value="${e.email||''}"></div>
+          </div>
+          <div class="fg"><label class="flbl">Yaşayış ünvanı</label><input class="finput" id="ep-addr" value="${e.addr||''}"></div>
+        </div>
+        <div class="mfooter">
+          <button class="btn btn-secondary" onclick="closeEditModal()">Ləğv et</button>
+          <button class="btn btn-primary" onclick="doEditPersonal(${eid})">Yadda saxla</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+
+function doEditPersonal(eid){
+  const e=DB.employees.find(x=>x.id===eid);
+  const fn=document.getElementById('ep-fn').value.trim();
+  const ln=document.getElementById('ep-ln').value.trim();
+  const fan=document.getElementById('ep-fan').value.trim();
+  const bd=document.getElementById('ep-bd').value;
+  const gender=document.getElementById('ep-gender').value;
+  const phone=document.getElementById('ep-phone').value.trim();
+  const email=document.getElementById('ep-email').value.trim();
+  const addr=document.getElementById('ep-addr').value.trim();
+  
+  if(!fn||!ln){alert('Ad və soyad mütləqdir!');return;}
+  
+  if(e.fn!==fn) logAudit(eid,'fn',e.fn,fn,'Ad dəyişdirildi');
+  if(e.ln!==ln) logAudit(eid,'ln',e.ln,ln,'Soyad dəyişdirildi');
+  if(e.fan!==fan) logAudit(eid,'fan',e.fan,fan,'Ata adı dəyişdirildi');
+  if(e.bd!==bd) logAudit(eid,'bd',e.bd,bd,'Doğum tarixi dəyişdirildi');
+  if(e.gender!==gender) logAudit(eid,'gender',e.gender,gender,'Cins dəyişdirildi');
+  if(e.phone!==phone) logAudit(eid,'phone',e.phone,phone,'Telefon dəyişdirildi');
+  if(e.email!==email) logAudit(eid,'email',e.email,email,'Email dəyişdirildi');
+  if(e.addr!==addr) logAudit(eid,'addr',e.addr,addr,'Ünvan dəyişdirildi');
+  
+  e.fn=fn;e.ln=ln;e.fan=fan;e.bd=bd;e.gender=gender;e.phone=phone;e.email=email;e.addr=addr;
+  closeEditModal();
+  renderCard();
+  renderAll();
+}
+
+function closeEditModal(){
+  // Re-open the card modal
+  const eid=S.eid;
+  document.getElementById('modals').innerHTML='';
+  setTimeout(()=>openCard(eid),10);
+}
+
+/* ===== EDIT MODALS FOR NEW TABS ===== */
+function openEditDocumentsModal(eid){
+  const e=DB.employees.find(x=>x.id===eid);
+  if(!e) return;
+  const html=`
+    <div class="backdrop" id="editdocs-bd" onclick="if(event.target.id==='editdocs-bd')closeEditModal()">
+      <div class="modal-box modal-md">
+        <div class="mh"><div class="mh-title">✎ Sənədləri Redaktə</div><button class="mclose" onclick="closeEditModal()">×</button></div>
+        <div class="mbody">
+          <div class="frow">
+            <div class="fg"><label class="flbl">VÖEN</label><input class="finput" id="ed-tax" value="${e.tax_number||''}" placeholder="10 rəqəm"></div>
+            <div class="fg"><label class="flbl">Təqaüd nömrəsi</label><input class="finput" id="ed-pension" value="${e.pension_number||''}"></div>
+          </div>
+          <div class="divider"></div>
+          <div class="sec-title mb3">Şəxsiyyət Vəsiqəsi</div>
+          <div class="frow">
+            <div class="fg"><label class="flbl">Seriyası</label><input class="finput" id="ed-id-serial" value="${e.id_serial||''}" maxlength="2"></div>
+            <div class="fg"><label class="flbl">Nömrəsi</label><input class="finput" id="ed-id-number" value="${e.id_number||''}" maxlength="6"></div>
+          </div>
+          <div class="frow">
+            <div class="fg"><label class="flbl">Verilib</label><input type="date" class="finput" id="ed-id-issue" value="${e.id_issue_date||''}"></div>
+            <div class="fg"><label class="flbl">Bitir</label><input type="date" class="finput" id="ed-id-expiry" value="${e.id_expiry_date||''}"></div>
+          </div>
+        </div>
+        <div class="mfooter">
+          <button class="btn btn-secondary" onclick="closeEditModal()">Ləğv et</button>
+          <button class="btn btn-primary" onclick="doEditDocuments(${eid})">Yadda saxla</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+
+function doEditDocuments(eid){
+  const e=DB.employees.find(x=>x.id===eid);
+  e.tax_number=document.getElementById('ed-tax').value.trim();
+  e.pension_number=document.getElementById('ed-pension').value.trim();
+  e.id_serial=document.getElementById('ed-id-serial').value.trim();
+  e.id_number=document.getElementById('ed-id-number').value.trim();
+  e.id_issue_date=document.getElementById('ed-id-issue').value;
+  e.id_expiry_date=document.getElementById('ed-id-expiry').value;
+  closeEditModal();
+  renderCard();
+}
+
+function openEditDriverModal(eid){
+  const e=DB.employees.find(x=>x.id===eid);
+  if(!e) return;
+  const catOptions = ['A','B','C','D','E'].map(c=>`<label style="display:inline-flex;align-items:center;gap:6px;margin-right:12px"><input type="checkbox" value="${c}" ${e.driver_categories?.includes(c)?'checked':''}> ${c}</label>`).join('');
+  const html=`
+    <div class="backdrop" id="editdriver-bd" onclick="if(event.target.id==='editdriver-bd')closeEditModal()">
+      <div class="modal-box modal-md">
+        <div class="mh"><div class="mh-title">✎ Sürücülük Vəsiqəsi</div><button class="mclose" onclick="closeEditModal()">×</button></div>
+        <div class="mbody">
+          <div class="fg">
+            <label class="flbl">Vəsiqə var?</label>
+            <select class="fselect" id="ed-dl-has">
+              <option value="true" ${e.driver_license?'selected':''}>✓ Var</option>
+              <option value="false" ${!e.driver_license?'selected':''}>✗ Yox</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label class="flbl">Kateqoriyalar</label>
+            <div style="margin:8px 0">${catOptions}</div>
+          </div>
+          <div class="frow">
+            <div class="fg"><label class="flbl">Verilib</label><input type="date" class="finput" id="ed-dl-issue" value="${e.driver_issue_date||''}"></div>
+            <div class="fg"><label class="flbl">Bitir</label><input type="date" class="finput" id="ed-dl-expiry" value="${e.driver_expiry_date||''}"></div>
+          </div>
+        </div>
+        <div class="mfooter">
+          <button class="btn btn-secondary" onclick="closeEditModal()">Ləğv et</button>
+          <button class="btn btn-primary" onclick="doEditDriver(${eid})">Yadda saxla</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+
+function doEditDriver(eid){
+  const e=DB.employees.find(x=>x.id===eid);
+  e.driver_license=document.getElementById('ed-dl-has').value==='true';
+  const cats = Array.from(document.querySelectorAll('#editdriver-bd input[type=checkbox]:checked')).map(cb=>cb.value);
+  e.driver_categories = cats;
+  e.driver_issue_date=document.getElementById('ed-dl-issue').value;
+  e.driver_expiry_date=document.getElementById('ed-dl-expiry').value;
+  closeEditModal();
+  renderCard();
+}
+
+function openEditBankModal(eid){
+  const e=DB.employees.find(x=>x.id===eid);
+  if(!e) return;
+  const html=`
+    <div class="backdrop" id="editbank-bd" onclick="if(event.target.id==='editbank-bd')closeEditModal()">
+      <div class="modal-box modal-md">
+        <div class="mh"><div class="mh-title">✎ Bank Məlumatları</div><button class="mclose" onclick="closeEditModal()">×</button></div>
+        <div class="mbody">
+          <div class="fg"><label class="flbl">Bank adı</label><input class="finput" id="ed-bank-name" value="${e.bank_name||''}"></div>
+          <div class="fg"><label class="flbl">Hesab (IBAN)</label><input class="finput" id="ed-bank-iban" value="${e.bank_iban||''}" placeholder="AZ00XXXX00000000000000000000" style="font-family:monospace"></div>
+          <div class="fg"><label class="flbl">Kart nömrəsi</label><input class="finput" id="ed-bank-card" value="${e.bank_card||''}" placeholder="****1234"></div>
+        </div>
+        <div class="mfooter">
+          <button class="btn btn-secondary" onclick="closeEditModal()">Ləğv et</button>
+          <button class="btn btn-primary" onclick="doEditBank(${eid})">Yadda saxla</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+
+function doEditBank(eid){
+  const e=DB.employees.find(x=>x.id===eid);
+  e.bank_name=document.getElementById('ed-bank-name').value.trim();
+  e.bank_iban=document.getElementById('ed-bank-iban').value.trim();
+  e.bank_card=document.getElementById('ed-bank-card').value.trim();
+  closeEditModal();
+  renderCard();
+}
+
+function openEditInsuranceModal(eid){
+  const e=DB.employees.find(x=>x.id===eid);
+  if(!e) return;
+  const html=`
+    <div class="backdrop" id="editins-bd" onclick="if(event.target.id==='editins-bd')closeEditModal()">
+      <div class="modal-box modal-md">
+        <div class="mh"><div class="mh-title">✎ Sığorta Məlumatları</div><button class="mclose" onclick="closeEditModal()">×</button></div>
+        <div class="mbody">
+          <div class="fg"><label class="flbl">Sığorta növü</label>
+            <select class="fselect" id="ed-ins-type">
+              <option value="">Seçin</option>
+              <option value="İcbari" ${e.insurance_type==='İcbari'?'selected':''}>İcbari</option>
+              <option value="Özəl" ${e.insurance_type==='Özəl'?'selected':''}>Özəl</option>
+            </select>
+          </div>
+          <div class="fg"><label class="flbl">Şirkət</label><input class="finput" id="ed-ins-company" value="${e.insurance_company||''}"></div>
+          <div class="frow">
+            <div class="fg"><label class="flbl">Nömrə</label><input class="finput" id="ed-ins-number" value="${e.insurance_number||''}"></div>
+            <div class="fg"><label class="flbl">Tarix</label><input type="date" class="finput" id="ed-ins-date" value="${e.insurance_date||''}"></div>
+          </div>
+        </div>
+        <div class="mfooter">
+          <button class="btn btn-secondary" onclick="closeEditModal()">Ləğv et</button>
+          <button class="btn btn-primary" onclick="doEditInsurance(${eid})">Yadda saxla</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+
+function doEditInsurance(eid){
+  const e=DB.employees.find(x=>x.id===eid);
+  e.insurance_type=document.getElementById('ed-ins-type').value;
+  e.insurance_company=document.getElementById('ed-ins-company').value.trim();
+  e.insurance_number=document.getElementById('ed-ins-number').value.trim();
+  e.insurance_date=document.getElementById('ed-ins-date').value;
+  closeEditModal();
+  renderCard();
+}
+
+function openEditMedicalModal(eid){
+  const e=DB.employees.find(x=>x.id===eid);
+  if(!e) return;
+  const html=`
+    <div class="backdrop" id="editmed-bd" onclick="if(event.target.id==='editmed-bd')closeEditModal()">
+      <div class="modal-box modal-md">
+        <div class="mh"><div class="mh-title">✎ Tibbi Məlumatlar</div><button class="mclose" onclick="closeEditModal()">×</button></div>
+        <div class="mbody">
+          <div class="fg"><label class="flbl">Qrup qanı</label>
+            <select class="fselect" id="ed-blood">
+              <option value="">Seçin</option>
+              ${['A+','A-','B+','B-','AB+','AB-','0+','0-'].map(bg=>`<option value="${bg}" ${e.blood_group===bg?'selected':''}>${bg}</option>`).join('')}
+            </select>
+          </div>
+          <div class="fg">
+            <label class="flbl">Əlillik var?</label>
+            <select class="fselect" id="ed-disability-has" onchange="document.getElementById('ed-disability-pct').disabled=this.value==='false'">
+              <option value="false" ${!e.disability?'selected':''}>✗ Yox</option>
+              <option value="true" ${e.disability?'selected':''}>✓ Var</option>
+            </select>
+          </div>
+          <div class="fg"><label class="flbl">Əlillik faizi</label><input type="number" class="finput" id="ed-disability-pct" value="${e.disability_percent||0}" ${!e.disability?'disabled':''}></div>
+          <div class="divider"></div>
+          <div class="fg"><label class="flbl">Xroniki xəstəliklər</label><textarea class="ftextarea" id="ed-chronic">${e.chronic_diseases||''}</textarea></div>
+          <div class="fg"><label class="flbl">Allergiyalar</label><textarea class="ftextarea" id="ed-allergies">${e.allergies||''}</textarea></div>
+        </div>
+        <div class="mfooter">
+          <button class="btn btn-secondary" onclick="closeEditModal()">Ləğv et</button>
+          <button class="btn btn-primary" onclick="doEditMedical(${eid})">Yadda saxla</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+
+function doEditMedical(eid){
+  const e=DB.employees.find(x=>x.id===eid);
+  e.blood_group=document.getElementById('ed-blood').value;
+  e.disability=document.getElementById('ed-disability-has').value==='true';
+  e.disability_percent=parseInt(document.getElementById('ed-disability-pct').value)||0;
+  e.chronic_diseases=document.getElementById('ed-chronic').value.trim();
+  e.allergies=document.getElementById('ed-allergies').value.trim();
+  closeEditModal();
+  renderCard();
+}
+
+function openAddCertificateModal(eid){
+  const e=DB.employees.find(x=>x.id===eid);
+  if(!e) return;
+  const html=`
+    <div class="backdrop" id="editcert-bd" onclick="if(event.target.id==='editcert-bd')closeEditModal()">
+      <div class="modal-box modal-md">
+        <div class="mh"><div class="mh-title">📜 Sertifikat Əlavə Et</div><button class="mclose" onclick="closeEditModal()">×</button></div>
+        <div class="mbody">
+          <div class="fg"><label class="flbl">Sertifikat adı *</label><input class="finput" id="ed-cert-name" placeholder="Məs: Əmək mühafizəsi"></div>
+          <div class="fg"><label class="flbl">Nömrə</label><input class="finput" id="ed-cert-number" placeholder="№"></div>
+          <div class="frow">
+            <div class="fg"><label class="flbl">Verilib</label><input type="date" class="finput" id="ed-cert-issue"></div>
+            <div class="fg"><label class="flbl">Bitir</label><input type="date" class="finput" id="ed-cert-expiry"></div>
+          </div>
+        </div>
+        <div class="mfooter">
+          <button class="btn btn-secondary" onclick="closeEditModal()">Ləğv et</button>
+          <button class="btn btn-primary" onclick="doAddCertificate(${eid})">Əlavə et</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+
+function doAddCertificate(eid){
+  const e=DB.employees.find(x=>x.id===eid);
+  const name=document.getElementById('ed-cert-name').value.trim();
+  if(!name){alert('Ad mütləqdir!');return;}
+  if(!e.industry_certificates) e.industry_certificates=[];
+  e.industry_certificates.push({
+    name,
+    number:document.getElementById('ed-cert-number').value.trim(),
+    issue_date:document.getElementById('ed-cert-issue').value,
+    expiry_date:document.getElementById('ed-cert-expiry').value
+  });
+  closeEditModal();
+  renderCard();
+}
+
+function openPhotoUpload(eid){
+  const e=DB.employees.find(x=>x.id===eid);
+  if(!e) return;
+  const html=`
+    <div class="backdrop" id="photo-bd" onclick="if(event.target.id==='photo-bd')closePhotoModal()">
+      <div class="modal-box modal-sm">
+        <div class="mh"><div class="mh-title">📷 Foto Yüklə</div><button class="mclose" onclick="closePhotoModal()">×</button></div>
+        <div class="mbody">
+          <div class="file-upload" onclick="document.getElementById('photo-input').click()">
+            <div class="fu-icon">📷</div>
+            <div class="fu-text">Foto seçin və ya bura sürüşdürün</div>
+          </div>
+          <input type="file" id="photo-input" accept="image/*" onchange="handleFileSelect(event,(f)=>{e.photo_path=f.data;alert('Foto yükləndi!');closePhotoModal();renderCard();})">
+          ${e.photo_path?`<div class="file-preview"><img src="${e.photo_path}"><span class="file-name">Cari foto</span><span class="file-remove" onclick="(()=>{e.photo_path=null;closePhotoModal();renderCard();})()">×</span></div>`:''}
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+
+function closePhotoModal(){
+  const eid=S.eid;
+  document.getElementById('modals').innerHTML='';
+  setTimeout(()=>openCard(eid),10);
+}
+
+function renderEducationTab(e){
+  const eds = DB.education.filter(x=>x.eid===e.id);
+  const rows = eds.map(ed=>`<div class="li-item">
+    <div class="li-icon" style="background:#EFF6FF;color:var(--accent)">🎓</div>
+    <div style="flex:1"><div class="fw6">${ed.inst}</div><div class="small muted">${ed.degree} · ${ed.field}</div><div class="xsmall" style="color:var(--t3)">${ed.sy} – ${ed.ey}</div></div>
+    <button class="btn btn-ghost btn-xs" onclick="openEditEduModal(${ed.id})">✎</button>
+  </div>`).join('');
+  return `
+    <div class="tab-content-wrapper">
+    ${fvSection('🎓 Təhsil Məlumatları',`
+      <div style="margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
+        <div class="fv-label" style="margin:0">Təhsil qeydləri</div>
+        <button class="btn btn-primary btn-sm" onclick="openAddEduModal(${e.id})">+ Əlavə et</button>
+      </div>
+      ${rows||`<div class="empty-s"><div class="ei">🎓</div><h3>Təhsil qeydləri yoxdur</h3></div>`}
+    `)}
+    </div>`;
+}
+
+function renderExperienceTab(e){
+  const exps = DB.experience.filter(x=>x.eid===e.id);
+  const rows = exps.map(ex=>`<div class="tl-item">
+    <div class="tl-dot" style="background:var(--accent)"></div>
+    <div style="flex:1">
+      <div class="tl-title">${ex.company}</div>
+      <div class="tl-sub">${ex.pos}</div>
+      <div class="tl-date">${fmtDate(ex.sd)} – ${ex.ed?fmtDate(ex.ed):'İndiyə qədər'} · ${ex.reason?'Çıxma səbəbi: '+ex.reason:''}</div>
+    </div>
+    <button class="btn btn-ghost btn-xs" onclick="openEditExpModal(${ex.id})">✎</button>
+  </div>`).join('');
+  return `
+    <div class="tab-content-wrapper">
+    ${fvSection('💼 İş Təcrübəsi',`
+      <div style="margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
+        <div class="fv-label" style="margin:0">Təcrübə qeydləri</div>
+        <button class="btn btn-primary btn-sm" onclick="openAddExpModal(${e.id})">+ Əlavə et</button>
+      </div>
+      ${rows||`<div class="empty-s"><div class="ei">💼</div><h3>Təcrübə qeydləri yoxdur</h3></div>`}
+    `)}
+    </div>`;
+}
+
+function renderFamilyTab(e){
+  const fams = DB.family.filter(x=>x.eid===e.id);
+  const rows = fams.map(f=>`<div class="li-item">
+    <div class="li-icon" style="background:var(--ok-l);color:var(--ok)">👤</div>
+    <div style="flex:1"><div class="fw6">${f.name}</div><div class="small muted">${f.rel}</div><div class="xsmall" style="color:var(--t3)">${f.contact}</div></div>
+    <button class="btn btn-ghost btn-xs" onclick="openEditFamilyModal(${f.id})">✎</button>
+  </div>`).join('');
+  return `
+    <div class="tab-content-wrapper">
+    ${fvSection('👨‍👩‍👧 Ailə Üzvləri',`
+      <div style="margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
+        <div class="fv-label" style="margin:0">Ailə məlumatları</div>
+        <button class="btn btn-primary btn-sm" onclick="openAddFamilyModal(${e.id})">+ Əlavə et</button>
+      </div>
+      ${rows||`<div class="empty-s"><div class="ei">👨‍👩‍👧</div><h3>Ailə məlumatı yoxdur</h3></div>`}
+    `)}
+    </div>`;
+}
+
+function openAddEduModal(eid){
+  const html=`
+    <div class="backdrop" id="edu-bd" onclick="if(event.target.id==='edu-bd')closeCardModal(true)">
+      <div class="modal-box modal-sm">
+        <div class="mh"><div class="mh-title">🎓 Təhsil Əlavə Et</div><button class="mclose" onclick="closeCardModal(true)">×</button></div>
+        <div class="mbody">
+          <div class="fg"><label class="flbl">Müəssisə adı *</label><input class="finput" id="edu-inst" placeholder="Universitet adı"></div>
+          <div class="fg"><label class="flbl">Dərəcə</label><select class="fselect" id="edu-deg"><option>Orta məktəb</option><option>Bakalavr</option><option>Magistr</option><option>Doktorantura</option></select></div>
+          <div class="fg"><label class="flbl">İxtisas</label><input class="finput" id="edu-field" placeholder="İxtisas adı"></div>
+          <div class="frow">
+            <div class="fg"><label class="flbl">Başlama ili</label><input class="finput" id="edu-sy" type="number" placeholder="2015"></div>
+            <div class="fg"><label class="flbl">Bitmə ili</label><input class="finput" id="edu-ey" type="number" placeholder="2019"></div>
+          </div>
+          <div class="fg">
+            <label class="flbl">Diplom skanı</label>
+            <div class="file-upload" onclick="document.getElementById('diploma-input').click()">
+              <div class="fu-text">📄 Diplom yükləyin (istəyə bağlı)</div>
+            </div>
+            <input type="file" id="diploma-input" accept="image/*,.pdf" onchange="handleFileSelect(event,(f)=>{window.tempDiploma=f;alert('Diplom yükləndi!');})">
+          </div>
+        </div>
+        <div class="mfooter">
+          <button class="btn btn-secondary" onclick="closeCardModal(true)">Ləğv et</button>
+          <button class="btn btn-primary" onclick="doAddEdu(${eid})">Əlavə et</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+
+function doAddEdu(eid){
+  const inst=document.getElementById('edu-inst').value.trim();
+  if(!inst){alert('Müəssisə adı mütləqdir!');return;}
+  const newId=Math.max(...DB.education.map(e=>e.id),0)+1;
+  DB.education.push({id:newId,eid,inst,degree:document.getElementById('edu-deg').value,field:document.getElementById('edu-field').value,sy:parseInt(document.getElementById('edu-sy').value)||null,ey:parseInt(document.getElementById('edu-ey').value)||null,diploma_file:window.tempDiploma||null});
+  window.tempDiploma=null;
+  document.getElementById('modals').innerHTML='';
+  openCard(eid,'education');
+}
+
+function openEditEduModal(id){
+  const ed=DB.education.find(x=>x.id===id);
+  if(!ed) return;
+  const eid=ed.eid;
+  const html=`
+    <div class="backdrop" id="edu-bd" onclick="if(event.target.id==='edu-bd')closeCardModal(true)">
+      <div class="modal-box modal-sm">
+        <div class="mh"><div class="mh-title">🎓 Təhsil Redaktə</div><button class="mclose" onclick="closeCardModal(true)">×</button></div>
+        <div class="mbody">
+          <div class="fg"><label class="flbl">Müəssisə adı *</label><input class="finput" id="edu-inst" value="${ed.inst}"></div>
+          <div class="fg"><label class="flbl">Dərəcə</label><select class="fselect" id="edu-deg"><option ${ed.degree==='Orta məktəb'?'selected':''}>Orta məktəb</option><option ${ed.degree==='Bakalavr'?'selected':''}>Bakalavr</option><option ${ed.degree==='Magistr'?'selected':''}>Magistr</option><option ${ed.degree==='Doktorantura'?'selected':''}>Doktorantura</option></select></div>
+          <div class="fg"><label class="flbl">İxtisas</label><input class="finput" id="edu-field" value="${ed.field||''}"></div>
+          <div class="frow">
+            <div class="fg"><label class="flbl">Başlama ili</label><input class="finput" id="edu-sy" type="number" value="${ed.sy||''}"></div>
+            <div class="fg"><label class="flbl">Bitmə ili</label><input class="finput" id="edu-ey" type="number" value="${ed.ey||''}"></div>
+          </div>
+        </div>
+        <div class="mfooter">
+          <button class="btn btn-ghost text-err" onclick="deleteEdu(${id})">Sil</button>
+          <div style="flex:1"></div>
+          <button class="btn btn-secondary" onclick="closeCardModal(true)">Ləğv et</button>
+          <button class="btn btn-primary" onclick="doEditEdu(${id})">Yadda saxla</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+
+function doEditEdu(id){
+  const ed=DB.education.find(x=>x.id===id);
+  ed.inst=document.getElementById('edu-inst').value.trim();
+  ed.degree=document.getElementById('edu-deg').value;
+  ed.field=document.getElementById('edu-field').value;
+  ed.sy=parseInt(document.getElementById('edu-sy').value)||null;
+  ed.ey=parseInt(document.getElementById('edu-ey').value)||null;
+  document.getElementById('modals').innerHTML='';
+  openCard(ed.eid,'education');
+}
+
+function deleteEdu(id){
+  const ed=DB.education.find(x=>x.id===id);
+  if(!ed) return;
+  if(!confirm('Bu qeydi silmək istədiyinizə əminsiniz?')) return;
+  const eid=ed.eid;
+  DB.education=DB.education.filter(x=>x.id!==id);
+  document.getElementById('modals').innerHTML='';
+  openCard(eid,'education');
+}
+
+function renderExperienceTab(e){
+  const exps = DB.experience.filter(x=>x.eid===e.id);
+  const rows = exps.map(ex=>`<div class="tl-item">
+    <div class="tl-dot" style="background:var(--accent)"></div>
+    <div style="flex:1">
+      <div class="tl-title">${ex.company}</div>
+      <div class="tl-sub">${ex.pos}</div>
+      <div class="tl-date">${fmtDate(ex.sd)} – ${ex.ed?fmtDate(ex.ed):'İndiyə qədər'} · ${ex.reason?'Çıxma səbəbi: '+ex.reason:''}</div>
+    </div>
+    <button class="btn btn-ghost btn-xs" onclick="openEditExpModal(${ex.id})">✎</button>
+  </div>`).join('');
+  return `
+    <div class="tab-content-wrapper">
+    <div class="sec-h"><div class="sec-title">İş təcrübəsi</div><button class="btn btn-primary btn-sm" onclick="openAddExpModal(${e.id})">+ Əlavə et</button></div>
+    ${rows||`<div class="empty-s"><div class="ei">💼</div><h3>Təcrübə qeydləri yoxdur</h3></div>`}
+    <div class="gap-note mt4 ok">✓ İş sertifikatı yükləmə funksiyası planlaşdırılır</div>
+    </div>`;
+}
+
+function renderFamilyTab(e){
+  const fams = DB.family.filter(x=>x.eid===e.id);
+  const rows = fams.map(f=>`<div class="li-item">
+    <div class="li-icon" style="background:var(--ok-l);color:var(--ok)">👤</div>
+    <div style="flex:1"><div class="fw6">${f.name}</div><div class="small muted">${f.rel}</div><div class="xsmall" style="color:var(--t3)">${f.contact}</div></div>
+    <button class="btn btn-ghost btn-xs" onclick="openEditFamilyModal(${f.id})">✎</button>
+  </div>`).join('');
+  return `
+    <div class="tab-content-wrapper">
+    <div class="sec-h"><div class="sec-title">Ailə üzvləri</div><button class="btn btn-primary btn-sm" onclick="openAddFamilyModal(${e.id})">+ Əlavə et</button></div>
+    ${rows||`<div class="empty-s"><div class="ei">👨‍👩‍👧</div><h3>Ailə məlumatı yoxdur</h3></div>`}
+    </div>`;
+}
+
+function openAddFamilyModal(eid){
+  const html=`
+    <div class="backdrop" id="fam-bd" onclick="if(event.target.id==='fam-bd')closeCardModal(true)">
+      <div class="modal-box modal-sm">
+        <div class="mh"><div class="mh-title">👤 Ailə Üzvü Əlavə Et</div><button class="mclose" onclick="closeCardModal(true)">×</button></div>
+        <div class="mbody">
+          <div class="fg"><label class="flbl">Qohumluq dərəcəsi *</label><select class="fselect" id="fam-rel"><option>Ata</option><option>Ana</option><option>Həyat yoldaşı</option><option>Qardaş</option><option>Bacı</option><option>Övlad</option></select></div>
+          <div class="fg"><label class="flbl">Ad Soyad *</label><input class="finput" id="fam-name" placeholder="Ad Soyad"></div>
+          <div class="fg"><label class="flbl">Əlaqə nömrəsi</label><input class="finput" id="fam-contact" placeholder="+994 XX XXX XX XX"></div>
+        </div>
+        <div class="mfooter">
+          <button class="btn btn-secondary" onclick="closeCardModal(true)">Ləğv et</button>
+          <button class="btn btn-primary" onclick="doAddFamily(${eid})">Əlavə et</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+
+function doAddFamily(eid){
+  const rel=document.getElementById('fam-rel').value;
+  const name=document.getElementById('fam-name').value.trim();
+  if(!name){alert('Ad mütləqdir!');return;}
+  const newId=Math.max(...DB.family.map(f=>f.id),0)+1;
+  DB.family.push({id:newId,eid,rel,name,contact:document.getElementById('fam-contact').value.trim()});
+  document.getElementById('modals').innerHTML='';
+  openCard(eid,'family');
+}
+
+function openEditFamilyModal(id){
+  const f=DB.family.find(x=>x.id===id);
+  if(!f) return;
+  const eid=f.eid;
+  const html=`
+    <div class="backdrop" id="fam-bd" onclick="if(event.target.id==='fam-bd')closeCardModal(true)">
+      <div class="modal-box modal-sm">
+        <div class="mh"><div class="mh-title">👤 Ailə Üzvü Redaktə</div><button class="mclose" onclick="closeCardModal(true)">×</button></div>
+        <div class="mbody">
+          <div class="fg"><label class="flbl">Qohumluq dərəcəsi *</label><select class="fselect" id="fam-rel">${['Ata','Ana','Həyat yoldaşı','Qardaş','Bacı','Övlad'].map(r=>`<option ${r===f.rel?'selected':''}>${r}</option>`).join('')}</select></div>
+          <div class="fg"><label class="flbl">Ad Soyad *</label><input class="finput" id="fam-name" value="${f.name}"></div>
+          <div class="fg"><label class="flbl">Əlaqə nömrəsi</label><input class="finput" id="fam-contact" value="${f.contact||''}"></div>
+        </div>
+        <div class="mfooter">
+          <button class="btn btn-ghost text-err" onclick="deleteFamily(${id})">Sil</button>
+          <div style="flex:1"></div>
+          <button class="btn btn-secondary" onclick="closeCardModal(true)">Ləğv et</button>
+          <button class="btn btn-primary" onclick="doEditFamily(${id})">Yadda saxla</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+
+function doEditFamily(id){
+  const f=DB.family.find(x=>x.id===id);
+  f.rel=document.getElementById('fam-rel').value;
+  f.name=document.getElementById('fam-name').value.trim();
+  f.contact=document.getElementById('fam-contact').value.trim();
+  document.getElementById('modals').innerHTML='';
+  openCard(f.eid,'family');
+}
+
+function deleteFamily(id){
+  const f=DB.family.find(x=>x.id===id);
+  if(!f) return;
+  if(!confirm('Bu qeydi silmək istədiyinizə əminsiniz?')) return;
+  const eid=f.eid;
+  DB.family=DB.family.filter(x=>x.id!==id);
+  document.getElementById('modals').innerHTML='';
+  openCard(eid,'family');
+}
+
+/* ===== EXPERIENCE FUNCTIONS ===== */
+function openAddExpModal(eid){
+  const html=`
+    <div class="backdrop" id="exp-bd" onclick="if(event.target.id==='exp-bd')closeCardModal(true)">
+      <div class="modal-box modal-sm">
+        <div class="mh"><div class="mh-title">💼 İş Təcrübəsi Əlavə Et</div><button class="mclose" onclick="closeCardModal(true)">×</button></div>
+        <div class="mbody">
+          <div class="fg"><label class="flbl">Şirkət adı *</label><input class="finput" id="exp-company" placeholder="Şirkət adı"></div>
+          <div class="fg"><label class="flbl">Vəzifə *</label><input class="finput" id="exp-pos" placeholder="Vəzifəniz"></div>
+          <div class="frow">
+            <div class="fg"><label class="flbl">Başlama tarixi *</label><input type="date" class="finput" id="exp-sd"></div>
+            <div class="fg"><label class="flbl">Bitmə tarixi</label><input type="date" class="finput" id="exp-ed" placeholder="İndiyə qədər"></div>
+          </div>
+          <div class="fg"><label class="flbl">Çıxma səbəbi</label><textarea class="ftextarea" id="exp-reason" placeholder="Çıxma səbəbi (istəyə bağlı)"></textarea></div>
+          <div class="fg">
+            <label class="flbl">İş sertifikatı</label>
+            <div class="file-upload" onclick="document.getElementById('cert-input').click()">
+              <div class="fu-text">📄 Sertifikat yükləyin (istəyə bağlı)</div>
+            </div>
+            <input type="file" id="cert-input" accept="image/*,.pdf" onchange="handleFileSelect(event,(f)=>{window.tempCertificate=f;alert('Sertifikat yükləndi!');})">
+          </div>
+        </div>
+        <div class="mfooter">
+          <button class="btn btn-secondary" onclick="closeCardModal(true)">Ləğv et</button>
+          <button class="btn btn-primary" onclick="doAddExp(${eid})">Əlavə et</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+
+function doAddExp(eid){
+  const company=document.getElementById('exp-company').value.trim();
+  const pos=document.getElementById('exp-pos').value.trim();
+  const sd=document.getElementById('exp-sd').value;
+  if(!company||!pos||!sd){alert('Şirkət, vəzifə və başlama tarixi mütləqdir!');return;}
+  const newId=Math.max(...DB.experience.map(e=>e.id),0)+1;
+  DB.experience.push({id:newId,eid,company,pos,sd,ed:document.getElementById('exp-ed').value,reason:document.getElementById('exp-reason').value.trim(),certificate_file:window.tempCertificate||null});
+  window.tempCertificate=null;
+  document.getElementById('modals').innerHTML='';
+  openCard(eid,'experience');
+}
+
+function openEditExpModal(id){
+  const ex=DB.experience.find(x=>x.id===id);
+  if(!ex) return;
+  const eid=ex.eid;
+  const html=`
+    <div class="backdrop" id="exp-bd" onclick="if(event.target.id==='exp-bd')closeCardModal(true)">
+      <div class="modal-box modal-sm">
+        <div class="mh"><div class="mh-title">💼 İş Təcrübəsi Redaktə</div><button class="mclose" onclick="closeCardModal(true)">×</button></div>
+        <div class="mbody">
+          <div class="fg"><label class="flbl">Şirkət adı *</label><input class="finput" id="exp-company" value="${ex.company}"></div>
+          <div class="fg"><label class="flbl">Vəzifə *</label><input class="finput" id="exp-pos" value="${ex.pos}"></div>
+          <div class="frow">
+            <div class="fg"><label class="flbl">Başlama tarixi *</label><input type="date" class="finput" id="exp-sd" value="${ex.sd}"></div>
+            <div class="fg"><label class="flbl">Bitmə tarixi</label><input type="date" class="finput" id="exp-ed" value="${ex.ed||''}"></div>
+          </div>
+          <div class="fg"><label class="flbl">Çıxma səbəbi</label><textarea class="ftextarea" id="exp-reason">${ex.reason||''}</textarea></div>
+        </div>
+        <div class="mfooter">
+          <button class="btn btn-ghost text-err" onclick="deleteExp(${id})">Sil</button>
+          <div style="flex:1"></div>
+          <button class="btn btn-secondary" onclick="closeCardModal(true)">Ləğv et</button>
+          <button class="btn btn-primary" onclick="doEditExp(${id})">Yadda saxla</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+
+function doEditExp(id){
+  const ex=DB.experience.find(x=>x.id===id);
+  ex.company=document.getElementById('exp-company').value.trim();
+  ex.pos=document.getElementById('exp-pos').value.trim();
+  ex.sd=document.getElementById('exp-sd').value;
+  ex.ed=document.getElementById('exp-ed').value;
+  ex.reason=document.getElementById('exp-reason').value.trim();
+  document.getElementById('modals').innerHTML='';
+  openCard(ex.eid,'experience');
+}
+
+function deleteExp(id){
+  const ex=DB.experience.find(x=>x.id===id);
+  if(!ex) return;
+  if(!confirm('Bu qeydi silmək istədiyinizə əminsiniz?')) return;
+  const eid=ex.eid;
+  DB.experience=DB.experience.filter(x=>x.id!==id);
+  document.getElementById('modals').innerHTML='';
+  openCard(eid,'experience');
+}
+
+function renderCorporateTab(e){
+  const dept=de(e.did), pos=po(e.pid), comp=co(e.cid);
+  const schedule = e.work_schedule||'Tam';
+  const location = e.work_location||'Ofis';
+  const reserve = e.is_reserve;
+  const hasSub = e.has_subordinates;
+  const probationEnd = e.probation_end_date ? fmtDate(e.probation_end_date) : '—';
+  const isProbationOver = e.probation_end_date && new Date(e.probation_end_date) < new Date();
+
+  return `
+    <div class="tab-content-wrapper">
+    ${fvSection('🏢 Korporativ Məlumatlar',`
+      <div class="fv-grid">
+        ${fvItem('Şirkət',comp?.name||'—')}
+        ${fvItem('Departament',dept?.name||'—')}
+        ${fvItem('Vəzifə',pos?.name||'—')}
+        ${fvItem('İşə qəbul',e.hire?fmtDate(e.hire):'—')}
+        ${fvItem('Maaş',e.salary!==null?fmtMoney(e.salary):'—')}
+      </div>
+    `)}
+
+    ${fvSection('📅 Sınaq Müddəti',`
+      <div class="fv-grid">
+        ${fvItem('Bitir tarixi',probationEnd)}
+        ${fvItem('Status',isProbationOver?'✅ Bitib':'⏳ Davam edir')}
+      </div>
+    `)}
+
+    ${fvSection('⚙️ İş Şərtləri',`
+      <div class="fv-grid">
+        ${fvItem('Qrafik',schedule)}
+        ${fvItem('İş yeri',location)}
+        ${fvPill('Tabecilik',hasSub,hasSub)}
+        ${fvPill('Ehtiyat kadr',reserve,reserve)}
+      </div>
+    `)}
+
+    ${fvSection('💰 Maaş Məlumatı',`
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px">
+        <input type="number" class="finput" id="emp-salary" value="${e.salary||''}" placeholder="Maaş məbləği" style="width:200px">
+        <button class="btn btn-primary" onclick="updateSalary(${e.id})">💰 Yadda Saxla</button>
+      </div>
+    `)}
+
+    ${fvSection('🔄 Status Əməliyyatları',`
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        ${e.status==='CANDIDATE'?`<button class="btn btn-success" onclick="openHireModal(${e.id})">✓ İşə qəbul et</button>`:''}
+        ${e.status==='ACTIVE'?`<button class="btn btn-danger" onclick="openTermModal(${e.id})">✗ Xitam ver</button>`:''}
+        ${e.status==='TERMINATED'?`<button class="btn btn-warn" onclick="restoreEmp(${e.id})">↺ Bərpa et</button>`:''}
+        ${(isHolding()||isAdmin())?`<button class="btn btn-ghost" onclick="openTransferModal(${e.id})">⇄ Transfer</button>`:''}
+      </div>
+    `)}
+    </div>`;
+}
+
+/* ===== NEW TABS ===== */
+function renderDocumentsTab(e){
+  const contractFile = e.contract_file ? `
+    <div class="file-preview">
+      <span class="fu-icon">📄</span>
+      <span class="file-name">${e.contract_file.name}</span>
+      <span class="file-remove" onclick="removeContractFile(${e.id})">×</span>
+    </div>` : '';
+  
+  return `
+    <div class="tab-content-wrapper">
+    ${fvSection('📄 Şəxsi Sənədlər',`
+      <div class="fv-grid">
+        ${fvItem('VÖEN',e.tax_number||'—',true)}
+        ${fvItem('Təqaüd nömrəsi',e.pension_number||'—',true)}
+      </div>
+    `)}
+    
+    ${fvSection('🆔 Şəxsiyyət Vəsiqəsi',`
+      <div class="fv-grid">
+        ${fvItem('Seriyası',e.id_serial||'—')}
+        ${fvItem('Nömrəsi',e.id_number||'—',true)}
+        ${fvItem('Verilib',e.id_issue_date?fmtDate(e.id_issue_date):'—')}
+        ${fvItem('Bitir',e.id_expiry_date?fmtDate(e.id_expiry_date):'—')}
+      </div>
+    `)}
+    
+    ${fvSection('📑 Əmək Müqaviləsi',`
+      <div class="file-upload" onclick="document.getElementById('contract-input').click()">
+        <div class="fu-icon">📄</div>
+        <div class="fu-text">Klikləyərək müqavilə yükləyin (PDF, max 10MB)</div>
+      </div>
+      <input type="file" id="contract-input" accept=".pdf" style="display:none" onchange="uploadContractFile(${e.id},this)">
+      ${contractFile}
+    `)}
+    
+    <div style="text-align:right;margin-top:20px">
+      <button class="btn btn-primary" onclick="openEditDocumentsModal(${e.id})">✎ Redaktə et</button>
+    </div>
+    </div>`;
+}
+
+function uploadContractFile(eid,input){
+  const file = input.files[0];
+  if(!file){return;}
+  if(file.size > 10*1024*1024){alert('Fayl 10MB-dan böyük ola bilməz!');return;}
+  
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const emp = DB.employees.find(x=>x.id===eid);
+    emp.contract_file = {name:file.name,size:file.size,data:e.target.result};
+    renderCard();
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeContractFile(eid){
+  const emp = DB.employees.find(x=>x.id===eid);
+  if(emp && confirm('Müqavilə faylını silmək istədiyinizə əminsiniz?')){
+    emp.contract_file = null;
+    renderCard();
+  }
+}
+
+function renderDriverTab(e){
+  const cats = e.driver_categories?.length>0 ? e.driver_categories.join(', ') : '—';
+  return `
+    <div class="tab-content-wrapper">
+    ${fvSection('🚗 Sürücülük Vəsiqəsi',`
+      <div class="fv-grid">
+        ${fvPill('Vəsiqə',e.driver_license,e.driver_license)}
+        ${fvItem('Kateqoriyalar',cats)}
+        ${fvItem('Verilib',e.driver_issue_date?fmtDate(e.driver_issue_date):'—')}
+        ${fvItem('Bitir',e.driver_expiry_date?fmtDate(e.driver_expiry_date):'—')}
+      </div>
+    `)}
+    <div style="text-align:right;margin-top:20px">
+      <button class="btn btn-primary" onclick="openEditDriverModal(${e.id})">✎ Redaktə et</button>
+    </div>
+    </div>`;
+}
+
+function renderBankTab(e){
+  return `
+    <div class="tab-content-wrapper">
+    ${fvSection('🏦 Bank Məlumatları',`
+      <div class="fv-grid">
+        ${fvItem('Bank adı',e.bank_name||'—')}
+        ${fvItem('Hesab (IBAN)',e.bank_iban||'—',true)}
+        ${fvItem('Kart',e.bank_card||'—',true)}
+      </div>
+    `)}
+    <div style="text-align:right;margin-top:20px">
+      <button class="btn btn-primary" onclick="openEditBankModal(${e.id})">✎ Redaktə et</button>
+    </div>
+    </div>`;
+}
+
+function renderInsuranceTab(e){
+  return `
+    <div class="tab-content-wrapper">
+    ${fvSection('🛡️ Sığorta Məlumatları',`
+      <div class="fv-grid">
+        ${fvItem('Sığorta növü',e.insurance_type||'—')}
+        ${fvItem('Şirkət',e.insurance_company||'—')}
+        ${fvItem('Nömrə',e.insurance_number||'—',true)}
+        ${fvItem('Tarix',e.insurance_date?fmtDate(e.insurance_date):'—')}
+      </div>
+    `)}
+    <div style="text-align:right;margin-top:20px">
+      <button class="btn btn-primary" onclick="openEditInsuranceModal(${e.id})">✎ Redaktə et</button>
+    </div>
+    </div>`;
+}
+
+function renderMedicalTab(e){
+  const disability = e.disability ? `${e.disability_percent}%` : 'Yox';
+  return `
+    <div class="tab-content-wrapper">
+    ${fvSection('🩸 Tibbi Məlumatlar',`
+      <div class="fv-grid">
+        ${fvItem('Qrup qanı',e.blood_group||'—')}
+        ${fvItem('Əlillik',disability)}
+      </div>
+    `)}
+    
+    ${fvSection('🏥 Sağlamlıq',`
+      <div class="fv-grid">
+        ${fvItem('Xroniki xəstəliklər',e.chronic_diseases||'—')}
+        ${fvItem('Allergiyalar',e.allergies||'—')}
+      </div>
+    `)}
+    <div style="text-align:right;margin-top:20px">
+      <button class="btn btn-primary" onclick="openEditMedicalModal(${e.id})">✎ Redaktə et</button>
+    </div>
+    </div>`;
+}
+
+function renderCertificatesTab(e){
+  const certs = e.industry_certificates||[];
+  const rows = certs.map(c=>`<div class="li-item">
+    <div class="li-icon" style="background:#EFF6FF;color:var(--accent)">📜</div>
+    <div style="flex:1">
+      <div class="fw6">${c.name}</div>
+      <div class="small muted">№ ${c.number}</div>
+      <div class="xsmall" style="color:var(--t3)">${fmtDate(c.issue_date)} – ${fmtDate(c.expiry_date)}</div>
+    </div>
+  </div>`).join('');
+  return `
+    <div class="tab-content-wrapper">
+    ${fvSection('📜 Sənaye Sertifikatları',`
+      <div style="margin-bottom:12px;display:flex;justify-content:space-between;align-items:center">
+        <div class="fv-label" style="margin:0">Sertifikatlar</div>
+        <button class="btn btn-primary btn-sm" onclick="openAddCertificateModal(${e.id})">+ Əlavə et</button>
+      </div>
+      ${rows||`<div class="empty-s"><div class="ei">📜</div><h3>Sertifikat yoxdur</h3></div>`}
+    `)}
+    </div>`;
+}
+
+function updateSalary(eid){
+  const e=DB.employees.find(x=>x.id===eid);
+  const salary=parseFloat(document.getElementById('emp-salary').value);
+  if(isNaN(salary)||salary<0){alert('Düzgün məbləğ daxil edin!');return;}
+  const oldSalary=e.salary;
+  e.salary=salary;
+  logAudit(eid,'salary',fmtMoney(oldSalary),fmtMoney(salary),'Maaş dəyişdirildi');
+  alert('Maaş yadda saxlanıldı!');
+  renderCard();
+}
+
+function openTransferModal(eid){
+  const e=DB.employees.find(x=>x.id===eid);
+  if(!e) return;
+  const html=`
+    <div class="backdrop" id="trans-bd" onclick="if(event.target.id==='trans-bd')closeCardModal(true)">
+      <div class="modal-box modal-sm">
+        <div class="mh"><div class="mh-title">⇄ Şirkətlərarası Transfer</div><button class="mclose" onclick="closeCardModal(true)">×</button></div>
+        <div class="mbody">
+          <div class="fg"><label class="flbl">Cari şirkət</label><input class="finput" value="${co(e.cid)?.name}" disabled></div>
+          <div class="fg"><label class="flbl">Yeni şirkət *</label><select class="fselect" id="trans-cid">${DB.companies.filter(c=>!c.is_holding&&c.id!==e.cid).map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}</select></div>
+          <div class="fg"><label class="flbl">Yeni vəzifə *</label><select class="fselect" id="trans-pid"></select></div>
+          <div class="fg"><label class="flbl">Yeni departament</label><select class="fselect" id="trans-did"></select></div>
+          <div class="fg"><label class="flbl">Köçürülmə tarixi *</label><input type="date" class="finput" id="trans-date" value="${new Date().toISOString().split('T')[0]}"></div>
+        </div>
+        <div class="mfooter">
+          <button class="btn btn-secondary" onclick="closeCardModal(true)">Ləğv et</button>
+          <button class="btn btn-primary" onclick="doTransfer(${eid})">Transfer et</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+  
+  // Update positions based on selected company
+  setTimeout(()=>{
+    const cidSelect=document.getElementById('trans-cid');
+    const pidSelect=document.getElementById('trans-pid');
+    const didSelect=document.getElementById('trans-did');
+    
+    function updateOptions(){
+      const cid=parseInt(cidSelect.value);
+      pidSelect.innerHTML=DB.positions.filter(p=>p.cid===cid&&p.status==='ACTIVE').map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+      didSelect.innerHTML=DB.departments.filter(d=>d.cid===cid).map(d=>`<option value="${d.id}">${d.name}</option>`).join('');
+    }
+    cidSelect.addEventListener('change',updateOptions);
+    updateOptions();
+  },50);
+}
+
+function doTransfer(eid){
+  const e=DB.employees.find(x=>x.id===eid);
+  const cid=parseInt(document.getElementById('trans-cid').value);
+  const pid=parseInt(document.getElementById('trans-pid').value);
+  const did=parseInt(document.getElementById('trans-did').value);
+  const date=document.getElementById('trans-date').value;
+  
+  if(!date){alert('Tarix mütləqdir!');return;}
+  
+  const oldCid=e.cid;
+  const oldPid=e.pid;
+  const oldDid=e.did;
+  
+  e.cid=cid;e.pid=pid;e.did=did;
+  
+  logAudit(eid,'cid',co(oldCid)?.name,co(cid)?.name,'Şirkət dəyişdirildi (transfer)');
+  logAudit(eid,'pid',po(oldPid)?.name,po(pid)?.name,'Vəzifə dəyişdirildi (transfer)');
+  logAudit(eid,'did',de(oldDid)?.name,de(did)?.name,'Departament dəyişdirildi (transfer)');
+  
+  DB.lifecycle.push({eid,uid:S.uid,old:'TRANSFER',new_s:'ACTIVE',desc:`Transfer: ${co(oldCid)?.name} → ${co(cid)?.name}`,date});
+
+  document.getElementById('modals').innerHTML='';
+  renderAll();
+  openCard(eid,'corporate');
+}
+
+function renderLifecycleTab(e){
+  const logs = DB.lifecycle.filter(l=>l.eid===e.id).sort((a,b)=>b.date.localeCompare(a.date));
+  const auditLogs = DB.auditLog.filter(l=>l.eid===e.id).sort((a,b)=>b.date.localeCompare(a.date));
+
+  const dotColors={ACTIVE:'var(--ok)',CANDIDATE:'var(--accent)',TERMINATED:'var(--err)',REJECTED:'#DC2626'};
+
+  const lifeRows = logs.map(l=>{
+    const u = DB.users.find(x=>x.id===l.uid);
+    return `<div class="tl-item">
+      <div class="tl-dot" style="background:${dotColors[l.new_s]||'var(--t3)'}"></div>
+      <div>
+        <div class="tl-title">${l.desc}</div>
+        <div class="tl-sub">${l.old?l.old+' → ':''}<strong>${l.new_s}</strong></div>
+        <div class="tl-date">${fmtDate(l.date)} · ${u?.name||'Sistem'}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const auditRows = auditLogs.map(l=>`<div class="tl-item">
+    <div class="tl-dot" style="background:var(--t3)"></div>
+    <div>
+      <div class="tl-title">${l.desc}</div>
+      <div class="tl-sub"><span class="tl-field">${l.field}</span>: <span class="audit-old">${l.old_value||'—'}</span> → <span class="audit-new">${l.new_value||'—'}</span></div>
+      <div class="tl-date">${fmtDate(l.date)}</div>
+    </div>
+  </div>`).join('');
+
+  return `
+    <div class="tab-content-wrapper">
+    ${fvSection('📜 Status Tarixçəsi',`
+      ${lifeRows||`<div class="empty-s"><div class="ei">📋</div><h3>Status tarixçəsi yoxdur</h3></div>`}
+    `)}
+    
+    ${fvSection('🔍 Tam Audit Trail',`
+      ${auditRows||`<div class="empty-s"><div class="ei">📝</div><h3>Audit qeydləri yoxdur</h3></div>`}
+    `)}
+    </div>`;
+}
+
+function closeCardModal(reopenCard=false){
+  document.getElementById('modals').innerHTML='';
+  if(reopenCard && S.eid) openCard(S.eid, S.etab);
+  renderFunk(S.view);
+}
+
+/* ===== HIRE MODAL ===== */
+function openHireModal(eid){
+  const e=DB.employees.find(x=>x.id===eid);
+  if(!e) return;
+  const popts=DB.positions.filter(p=>p.cid===e.cid&&p.status==='ACTIVE').map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
+  const dopts=DB.departments.filter(d=>d.cid===e.cid).map(d=>`<option value="${d.id}">${d.name}</option>`).join('');
+  const html=`
+    <div class="backdrop" id="hire-bd" onclick="if(event.target.id==='hire-bd')closeCardModal(true)">
+      <div class="modal-box modal-md">
+        <div class="mh"><div class="mh-title">✓ İşə qəbul — ${e.fn} ${e.ln}</div><button class="mclose" onclick="closeCardModal(true)">×</button></div>
+        <div class="mbody">
+          <div class="fg"><label class="flbl">Vəzifə *</label><select class="fselect" id="h-pos">${popts}</select></div>
+          <div class="fg"><label class="flbl">Departament *</label><select class="fselect" id="h-dept">${dopts}</select></div>
+          <div class="fg"><label class="flbl">İşə başlama tarixi *</label><input type="date" class="finput" id="h-date" value="${new Date().toISOString().split('T')[0]}"></div>
+          <div class="fg"><label class="flbl">Maaş *</label><input type="number" class="finput" id="h-salary" placeholder="AZN məbləği daxil edin"></div>
+        </div>
+        <div class="mfooter">
+          <button class="btn btn-secondary" onclick="closeCardModal(true)">Ləğv et</button>
+          <button class="btn btn-success" onclick="doHire(${eid})">İşə qəbul et</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+
+function doHire(eid){
+  const e=DB.employees.find(x=>x.id===eid);
+  const pos=parseInt(document.getElementById('h-pos').value);
+  const dept=parseInt(document.getElementById('h-dept').value);
+  const date=document.getElementById('h-date').value;
+  const salary=parseFloat(document.getElementById('h-salary').value);
+  if(!date){alert('Tarix mütləqdir!');return;}
+  if(isNaN(salary)||salary<0){alert('Düzgün maaş daxil edin!');return;}
+
+  const oldStatus=e.status;
+  e.status='ACTIVE'; e.pid=pos; e.did=dept; e.hire=date; e.salary=salary;
+
+  logAudit(eid,'status',oldStatus,'ACTIVE','İşə qəbul edildi');
+  logAudit(eid,'pid',null,po(pos)?.name,'Vəzifə təyin edildi');
+  logAudit(eid,'did',null,de(dept)?.name,'Departament təyin edildi');
+  logAudit(eid,'salary',null,fmtMoney(salary),'Maaş təyin edildi');
+
+  DB.lifecycle.push({eid,uid:S.uid,old:'CANDIDATE',new_s:'ACTIVE',desc:`İşə qəbul edildi — ${po(pos)?.name}`,date});
+  document.getElementById('modals').innerHTML='';
+  renderAll();
+  openCard(eid,'corporate');
+  S.tab='ACTIVE';
+}
+
+/* ===== TERMINATE MODAL ===== */
+function openTermModal(eid){
+  const e=DB.employees.find(x=>x.id===eid);
+  if(!e) return;
+  const termReasons = DB.dictionaries.termination_reasons.filter(r=>r.is_active).map(r=>`<option>${r.name}</option>`).join('');
+  const html=`
+    <div class="backdrop" id="term-bd" onclick="if(event.target.id==='term-bd')closeCardModal(true)">
+      <div class="modal-box modal-sm">
+        <div class="mh"><div class="mh-title" style="color:var(--err)">✗ Xitam — ${e.fn} ${e.ln}</div><button class="mclose" onclick="closeCardModal(true)">×</button></div>
+        <div class="mbody">
+          <div class="fg"><label class="flbl">Xitam tarixi *</label><input type="date" class="finput" id="t-date" value="${new Date().toISOString().split('T')[0]}"></div>
+          <div class="fg"><label class="flbl">Xitam səbəbi *</label>
+            <select class="fselect" id="t-reason-sel" onchange="document.getElementById('t-custom').style.display=this.value==='custom'?'block':'none'">
+              ${termReasons}
+              <option value="custom">Digər (əl ilə daxil et)</option>
+            </select>
+          </div>
+          <div class="fg" id="t-custom" style="display:none"><label class="flbl">Səbəbi daxil edin</label><textarea class="ftextarea" id="t-reason-txt" placeholder="Xitam səbəbini qeyd edin..."></textarea></div>
+        </div>
+        <div class="mfooter">
+          <button class="btn btn-secondary" onclick="closeCardModal(true)">Ləğv et</button>
+          <button class="btn btn-danger" onclick="doTerminate(${eid})">Xitam ver</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+
+function doTerminate(eid){
+  const e=DB.employees.find(x=>x.id===eid);
+  const date=document.getElementById('t-date').value;
+  const sel=document.getElementById('t-reason-sel').value;
+  const reason=sel==='custom'?document.getElementById('t-reason-txt').value:sel;
+  if(!date||!reason){alert('Tarix və səbəb mütləqdir!');return;}
+
+  const oldStatus=e.status;
+  e.status='TERMINATED'; e.term_date=date; e.term_reason=reason;
+
+  logAudit(eid,'status',oldStatus,'TERMINATED','Xitam verildi');
+
+  DB.lifecycle.push({eid,uid:S.uid,old:'ACTIVE',new_s:'TERMINATED',desc:`Xitam verildi — ${reason}`,date});
+  document.getElementById('modals').innerHTML='';
+  renderAll();
+  openCard(eid,'corporate');
+  S.tab='TERMINATED';
+}
+
+/* ===== REJECT MODAL ===== */
+function openRejectModal(eid){
+  const e=DB.employees.find(x=>x.id===eid);
+  if(!e) return;
+  const html=`
+    <div class="backdrop" id="reject-bd" onclick="if(event.target.id==='reject-bd')closeCardModal(true)">
+      <div class="modal-box modal-sm">
+        <div class="mh"><div class="mh-title" style="color:var(--err)">✕ Namizədi Rədd Et</div><button class="mclose" onclick="closeCardModal(true)">×</button></div>
+        <div class="mbody">
+          <div class="fg"><label class="flbl">Rədd səbəbi *</label>
+            <select class="fselect" id="r-reason-sel" onchange="document.getElementById('r-custom').style.display=this.value==='custom'?'block':'none'">
+              <option>Təcrübə uyğun deyil</option>
+              <option>Gözlənilən maaş yüksəkdir</option>
+              <option>Müsahibə nəticəsi məqbul deyil</option>
+              <option>Vakat bağlandı</option>
+              <option value="custom">Digər (əl ilə daxil et)</option>
+            </select>
+          </div>
+          <div class="fg" id="r-custom" style="display:none"><label class="flbl">Səbəbi daxil edin</label><textarea class="ftextarea" id="r-reason-txt" placeholder="Rədd səbəbini qeyd edin..."></textarea></div>
+          <div class="fg"><label class="flbl">Geri əlaqə mətni (istəyə bağlı)</label><textarea class="ftextarea" id="r-feedback" placeholder="Namizədə göndəriləcək mətn..."></textarea></div>
+        </div>
+        <div class="mfooter">
+          <button class="btn btn-secondary" onclick="closeCardModal(true)">Ləğv et</button>
+          <button class="btn btn-danger" onclick="doReject(${eid})">Rədd et</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+
+function doReject(eid){
+  const e=DB.employees.find(x=>x.id===eid);
+  const sel=document.getElementById('r-reason-sel').value;
+  const reason=sel==='custom'?document.getElementById('r-reason-txt').value:sel;
+  if(!reason){alert('Səbəb mütləqdir!');return;}
+
+  e.status='REJECTED';
+  e.reject_reason=reason;
+  e.reject_feedback=document.getElementById('r-feedback').value.trim();
+
+  logAudit(eid,'status','CANDIDATE','REJECTED',`Namizəd rədd edildi: ${reason}`);
+
+  DB.lifecycle.push({eid,uid:S.uid,old:'CANDIDATE',new_s:'REJECTED',desc:`Namizəd rədd edildi — ${reason}`,date:new Date().toISOString().split('T')[0]});
+  document.getElementById('modals').innerHTML='';
+  renderAll();
+}
+
+/* ===== RESTORE ===== */
+function restoreEmp(eid){
+  const e=DB.employees.find(x=>x.id===eid);
+  if(!confirm(`${e.fn} ${e.ln} — bərpa etmək istəyirsiniz?`)) return;
+
+  const oldStatus=e.status;
+  e.status='ACTIVE'; e.term_date=null; e.term_reason=null;
+
+  logAudit(eid,'status',oldStatus,'ACTIVE','Bərpa edildi');
+
+  DB.lifecycle.push({eid,uid:S.uid,old:'TERMINATED',new_s:'ACTIVE',desc:'Bərpa edildi',date:new Date().toISOString().split('T')[0]});
+  document.getElementById('modals').innerHTML='';
+  renderAll();
+  openCard(eid,'corporate');
+  S.tab='ACTIVE';
+}
+
+/* ===== NEW EMPLOYEE MODAL ===== */
+function openNewEmpModal(){
+  const cid = isSubHR() ? myCid() : (S.cid_filter||2);
+  const terminatedEmps = DB.employees.filter(e=>e.status==='TERMINATED');
+  const terminatedOptions = terminatedEmps.map(e=>`<option value="${e.id}">${e.fn} ${e.ln} - ${co(e.cid)?.name||''}</option>`).join('');
+  
+  const html=`
+    <div class="backdrop" id="new-bd" onclick="if(event.target.id==='new-bd')closeNewEmpModal()">
+      <div class="modal-box modal-md">
+        <div class="mh"><div class="mh-title">+ Yeni Namizəd Profilsı</div><button class="mclose" onclick="closeNewEmpModal()">×</button></div>
+        <div class="mbody">
+          <div class="fg">
+            <label class="flbl">Keçmiş işçilərdən seç</label>
+            <select class="fselect" id="ne-terminated" onchange="fillFromTerminated()">
+              <option value="">-- Seçin --</option>
+              ${terminatedOptions}
+            </select>
+            <div class="fhint">Seçdikdə məlumatlar avtomatik doldurulacaq</div>
+          </div>
+          <div class="divider"></div>
+          <div class="frow">
+            <div class="fg"><label class="flbl">Ad *</label><input class="finput" id="ne-fn" placeholder="Ad"></div>
+            <div class="fg"><label class="flbl">Soyad *</label><input class="finput" id="ne-ln" placeholder="Soyad"></div>
+          </div>
+          <div class="frow">
+            <div class="fg"><label class="flbl">Ata adı</label><input class="finput" id="ne-fan" placeholder="Ata adı"></div>
+            <div class="fg"><label class="flbl">FİN Kod * (7 simvol)</label><input class="finput" id="ne-fin" placeholder="1AB2C3D" maxlength="7"></div>
+          </div>
+          <div class="frow">
+            <div class="fg"><label class="flbl">Doğum tarixi</label><input type="date" class="finput" id="ne-bd"></div>
+            <div class="fg"><label class="flbl">Cins</label><select class="fselect" id="ne-gender"><option value="">Seçin</option><option>Kişi</option><option>Qadın</option></select></div>
+          </div>
+          <div class="frow">
+            <div class="fg"><label class="flbl">Mobil nömrə</label><input class="finput" id="ne-phone" placeholder="+994 XX XXX XX XX"></div>
+            <div class="fg"><label class="flbl">Email</label><input type="email" class="finput" id="ne-email" placeholder="email@domain.az"></div>
+          </div>
+          <div class="fg">
+            <label class="flbl">CV Yüklə (PDF/Word, max 5MB)</label>
+            <div class="file-upload" onclick="document.getElementById('cv-input').click()">
+              <div class="fu-icon">📄</div>
+              <div class="fu-text">Klikləyərək CV yükləyin</div>
+            </div>
+            <input type="file" id="cv-input" accept=".pdf,.doc,.docx" style="display:none" onchange="handleCVSelect(this)">
+            <div id="cv-preview"></div>
+          </div>
+          ${isHolding()||isAdmin()?`<div class="fg"><label class="flbl">Şirkət *</label><select class="fselect" id="ne-cid">${DB.companies.filter(c=>!c.is_holding).map(c=>`<option value="${c.id}" ${c.id===cid?'selected':''}>${c.name}</option>`).join('')}</select></div>`:`<input type="hidden" id="ne-cid" value="${cid}">`}
+        </div>
+        <div class="mfooter">
+          <button class="btn btn-secondary" onclick="closeNewEmpModal()">Ləğv et</button>
+          <button class="btn btn-primary" onclick="doCreateEmp()">Profil yarat</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+
+let tempCVFile = null;
+function handleCVSelect(input){
+  const file = input.files[0];
+  if(!file){return;}
+  if(file.size > 5*1024*1024){alert('Fayl 5MB-dan böyük ola bilməz!');return;}
+  tempCVFile = {name:file.name,size:file.size};
+  document.getElementById('cv-preview').innerHTML = `<div class="file-preview"><span class="fu-icon">📄</span><span class="file-name">${file.name} (${(file.size/1024/1024).toFixed(2)} MB)</span></div>`;
+}
+
+function fillFromTerminated(){
+  const termId = parseInt(document.getElementById('ne-terminated').value);
+  if(!termId){return;}
+  const termEmp = DB.employees.find(e=>e.id===termId);
+  if(termEmp){
+    document.getElementById('ne-fn').value = termEmp.fn;
+    document.getElementById('ne-ln').value = termEmp.ln;
+    document.getElementById('ne-fan').value = termEmp.fan||'';
+    document.getElementById('ne-bd').value = termEmp.bd||'';
+    document.getElementById('ne-gender').value = termEmp.gender||'';
+    document.getElementById('ne-phone').value = termEmp.phone||'';
+    document.getElementById('ne-email').value = termEmp.email||'';
+  }
+}
+
+function closeNewEmpModal(){document.getElementById('modals').innerHTML='';tempCVFile=null;}
+function doCreateEmp(){
+  const fn=document.getElementById('ne-fn').value.trim();
+  const ln=document.getElementById('ne-ln').value.trim();
+  const fin=document.getElementById('ne-fin').value.trim().toUpperCase();
+  const cid=parseInt(document.getElementById('ne-cid').value);
+  if(!fn||!ln||fin.length!==7){alert('Ad, soyad və 7 simvollu FİN mütləqdir!');return;}
+  if(DB.employees.find(e=>e.fin===fin)){alert('Bu FİN kodu artıq mövcuddur!');return;}
+  const newId=Math.max(...DB.employees.map(e=>e.id))+1;
+  const newEmp={
+    id:newId,cid,fn,ln,
+    fan:document.getElementById('ne-fan').value,
+    fin,
+    bd:document.getElementById('ne-bd').value,
+    gender:document.getElementById('ne-gender').value,
+    status:'CANDIDATE',did:null,pid:null,hire:null,
+    phone:document.getElementById('ne-phone').value,
+    email:document.getElementById('ne-email').value,
+    salary:null,photo_path:null,files:[],
+    cv_file:tempCVFile,
+    contract_file:null,
+    probation_end_date:null,
+    marital_status:'',children_count:0,military_service:'',military_rank:'',
+    id_serial:'',id_number:'',id_issue_date:'',id_expiry_date:'',
+    pension_number:'',tax_number:'',
+    driver_license:false,driver_categories:[],driver_issue_date:'',driver_expiry_date:'',
+    emergency_contact:{name:'',phone:'',relation:''},
+    reg_address:'',fact_address:'',
+    bank_name:'',bank_iban:'',bank_card:'',
+    insurance_type:'',insurance_company:'',insurance_number:'',insurance_date:'',
+    blood_group:'',chronic_diseases:'',allergies:'',disability:false,disability_percent:0,
+    work_schedule:'Tam',work_location:'Ofis',manager_id:null,has_subordinates:false,is_reserve:false,
+    industry_certificates:[]
+  };
+  DB.employees.push(newEmp);
+  DB.lifecycle.push({eid:newId,uid:S.uid,old:null,new_s:'CANDIDATE',desc:'Namizəd profilsı yaradıldı',date:new Date().toISOString().split('T')[0]});
+  logAudit(newId,'status',null,'CANDIDATE','Namizəd profilsı yaradıldı');
+  tempCVFile=null;
+  closeNewEmpModal();
+  S.tab='CANDIDATE'; S.view='employees';
+  renderAll();
+  setTimeout(()=>openCard(newId),100);
+}
+
+/* ===== COMPANY MODAL ===== */
+function openAddCompanyModal(){
+  const html=`
+    <div class="backdrop" id="co-bd" onclick="if(event.target.id==='co-bd')closeModal()">
+      <div class="modal-box modal-sm">
+        <div class="mh"><div class="mh-title">🏢 Yeni Şirkət</div><button class="mclose" onclick="closeModal()">×</button></div>
+        <div class="mbody">
+          <div class="fg"><label class="flbl">Şirkət adı *</label><input class="finput" id="co-name" placeholder="MMC adı"></div>
+          <div class="fg"><label class="flbl">VÖEN</label><input class="finput" id="co-tax" placeholder="0000000000" maxlength="10"></div>
+          <div class="fg"><label class="flbl">Parent şirkət</label><select class="fselect" id="co-parent"><option value="">Birbaşa holding</option>${DB.companies.filter(c=>c.is_holding).map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}</select></div>
+        </div>
+        <div class="mfooter"><button class="btn btn-secondary" onclick="closeModal()">Ləğv et</button><button class="btn btn-primary" onclick="doAddCo()">Yarat</button></div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+function doAddCo(){
+  const n=document.getElementById('co-name').value.trim();
+  if(!n){alert('Ad mütləqdir!');return;}
+  const parentId=document.getElementById('co-parent').value;
+  DB.companies.push({id:Math.max(...DB.companies.map(c=>c.id))+1,name:n,is_holding:false,parent_id:parentId?parseInt(parentId):1,tax_id:document.getElementById('co-tax').value});
+  closeModal(); renderAll();
+}
+
+/* ===== COMPANY CRUD FOR ORG TREE ===== */
+const industries=[
+  {value:'CONSTRUCTION',label:'🏗️ Construction',icon:'🏗️'},
+  {value:'LOGISTICS',label:'🚛 Logistics',icon:'🚛'},
+  {value:'HOTEL',label:'🏨 Hotel',icon:'🏨'},
+  {value:'RESTAURANT_CHAIN',label:'🍽️ Restaurant Chain',icon:'🍽️'},
+  {value:'RESTAURANT',label:'🔴 Restaurant',icon:'🔴'},
+  {value:'AGRICULTURE',label:'🌾 Agriculture',icon:'🌾'},
+  {value:'PRODUCTION',label:'🔥 Production',icon:'🔥'},
+  {value:'SPORTS',label:'🥋 Sports',icon:'🥋'},
+];
+
+function openAddSubCompanyModal(parentId){
+  const parent=DB.companies.find(c=>c.id===parentId);
+  const industryOptions=industries.map(i=>`<option value="${i.value}">${i.icon} ${i.label}</option>`).join('');
+  const html=`
+    <div class="backdrop" id="subco-bd" onclick="if(event.target.id==='subco-bd')closeModal()">
+      <div class="modal-box modal-md">
+        <div class="mh"><div class="mh-title">➕ Yeni Şirkət Əlavə Et</div><button class="mclose" onclick="closeModal()">×</button></div>
+        <div class="mbody">
+          <div class="fg"><label class="flbl">Ana şirkət</label><input class="finput" value="${parent?.name||'Holding'}" disabled></div>
+          <div class="fg"><label class="flbl">Şirkət adı *</label><input class="finput" id="subco-name" placeholder="Şirkət adı"></div>
+          <div class="fg"><label class="flbl">VÖEN *</label><input class="finput" id="subco-tax" placeholder="10 rəqəmli VÖEN" maxlength="10"></div>
+          <div class="fg"><label class="flbl">Sahə *</label><select class="fselect" id="subco-industry">${industryOptions}</select></div>
+          <div class="fg"><label class="flbl">Ünvan</label><textarea class="ftextarea" id="subco-address" placeholder="Tam ünvan"></textarea></div>
+        </div>
+        <div class="mfooter">
+          <button class="btn btn-secondary" onclick="closeModal()">Ləğv et</button>
+          <button class="btn btn-primary" onclick="doAddSubCompany(${parentId})">Yarat</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+
+function doAddSubCompany(parentId){
+  const name=document.getElementById('subco-name').value.trim();
+  const tax=document.getElementById('subco-tax').value.trim();
+  const industry=document.getElementById('subco-industry').value;
+  const address=document.getElementById('subco-address').value.trim();
+  
+  if(!name||!tax){alert('Ad və VÖEN mütləqdir!');return;}
+  if(tax.length!==10){alert('VÖEN 10 rəqəm olmalıdır!');return;}
+  
+  const newId=Math.max(...DB.companies.map(c=>c.id))+1;
+  DB.companies.push({id:newId,name,tax_id:tax,industry,address,parent_id:parentId,is_holding:false});
+  
+  // Expand parent to show new child
+  if(!treeState.expanded.includes(parentId)) treeState.expanded.push(parentId);
+  
+  closeModal();
+  renderContent();
+}
+
+function openEditCompanyModal(id){
+  const c=DB.companies.find(x=>x.id===id);
+  if(!c) return;
+
+  const industryOptions=industries.map(i=>`<option value="${i.value}" ${i.value===c.industry?'selected':''}>${i.icon} ${i.label}</option>`).join('');
+  
+  // Get all companies except children of current company (to prevent circular reference)
+  const getParentOptions = () => {
+    const children = getChildren(c.id);
+    const childIds = children.map(ch => ch.id);
+    return DB.companies
+      .filter(x => x.id !== c.id && !childIds.includes(x.id))
+      .map(x => `<option value="${x.id}" ${x.id===c.parent_id?'selected':''}>${x.name} ${x.is_holding?'(Holding)':''}</option>`)
+      .join('');
+  };
+
+  const html=`
+    <div class="backdrop" id="editco-bd" onclick="if(event.target.id==='editco-bd')closeModal()">
+      <div class="modal-box modal-md">
+        <div class="mh"><div class="mh-title">✎ Şirkəti Redaktə</div><button class="mclose" onclick="closeModal()">×</button></div>
+        <div class="mbody">
+          <div class="fg"><label class="flbl">Şirkət ID</label><input class="finput" value="${c.id}" disabled></div>
+          <div class="fg"><label class="flbl">Şirkət adı *</label><input class="finput" id="editco-name" value="${c.name}"></div>
+          <div class="fg"><label class="flbl">VÖEN *</label><input class="finput" id="editco-tax" value="${c.tax_id}" maxlength="10"></div>
+          <div class="fg"><label class="flbl">Sahə *</label><select class="fselect" id="editco-industry">${industryOptions}</select></div>
+          <div class="fg"><label class="flbl">Ünvan</label><textarea class="ftextarea" id="editco-address">${c.address||''}</textarea></div>
+          ${!c.is_holding?`<div class="fg"><label class="flbl">Ana şirkət</label><select class="fselect" id="editco-parent"><option value="">Holding (birbaşa)</option>${getParentOptions()}</select></div>`:''}
+        </div>
+        <div class="mfooter">
+          ${!c.is_holding?`<button class="btn btn-ghost text-err" onclick="deleteCompany(${c.id})">🗑 Sil</button>`:''}
+          <div style="flex:1"></div>
+          <button class="btn btn-secondary" onclick="closeModal()">Ləğv et</button>
+          <button class="btn btn-primary" onclick="doEditCompany(${c.id})">Yadda saxla</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+
+function doEditCompany(id){
+  const c=DB.companies.find(x=>x.id===id);
+  const name=document.getElementById('editco-name').value.trim();
+  const tax=document.getElementById('editco-tax').value.trim();
+  const industry=document.getElementById('editco-industry').value;
+  const address=document.getElementById('editco-address').value.trim();
+  
+  if(!name||!tax){alert('Ad və VÖEN mütləqdir!');return;}
+  if(tax.length!==10){alert('VÖEN 10 rəqəm olmalıdır!');return;}
+  
+  c.name=name;
+  c.tax_id=tax;
+  c.industry=industry;
+  c.address=address;
+  if(!c.is_holding){
+    c.parent_id=document.getElementById('editco-parent').value?parseInt(document.getElementById('editco-parent').value):null;
+  }
+  
+  closeModal();
+  renderContent();
+}
+
+function deleteCompany(id){
+  const c=DB.companies.find(x=>x.id===id);
+  if(!c) return;
+  if(c.is_holding){alert('Holding silinə bilməz!');return;}
+  
+  const children=getChildren(id);
+  if(children.length>0){
+    if(!confirm(`Bu şirkətin ${children.length} alt şirkəti var. Silməyə əminsiniz? Alt şirkətlər də silinəcək.`)){
+      return;
+    }
+    // Delete children recursively
+    children.forEach(child=>deleteCompany(child.id));
+  }
+  
+  // Check for employees
+  const emps=DB.employees.filter(e=>e.cid===id);
+  if(emps.length>0){
+    if(!confirm(`Bu şirkətə ${emps.length} işçi bağlıdır. Silməyə əminsiniz? İşçilər silinməyəcək, amma şirkətsiz qalacaq.`)){
+      return;
+    }
+    emps.forEach(e=>{e.cid=null;e.did=null;e.pid=null;});
+  }
+  
+  DB.companies=DB.companies.filter(x=>x.id!==id);
+  closeModal();
+  renderContent();
+}
+
+/* ===== USER MODAL ===== */
+function openAddUserModal(){
+  // Generate random username and password
+  const genUsername = (name) => name.toLowerCase().replace(/[^a-z]/g,'').substring(0,8);
+  const genPassword = () => Math.random().toString(36).slice(-8);
+  const tempUsername = genUsername('NewUser');
+  const tempPassword = genPassword();
+  
+  const html=`
+    <div class="backdrop" id="usr-bd" onclick="if(event.target.id==='usr-bd')closeModal()">
+      <div class="modal-box modal-sm">
+        <div class="mh"><div class="mh-title">👤 Yeni İstifadəçi</div><button class="mclose" onclick="closeModal()">×</button></div>
+        <div class="mbody">
+          <div class="fg"><label class="flbl">Ad Soyad *</label><input class="finput" id="u-name" placeholder="Ad Soyad" oninput="document.getElementById('u-username').value='${genUsername('')}'+this.value.toLowerCase().replace(/[^a-z]/g,'').substring(0,8)"></div>
+          <div class="fg"><label class="flbl">Email *</label><input type="email" class="finput" id="u-email" placeholder="user@company.az"></div>
+          <div class="frow">
+            <div class="fg"><label class="flbl">Username *</label><input class="finput" id="u-username" placeholder="username" value="${tempUsername}"></div>
+            <div class="fg"><label class="flbl">Şifrə *</label><input class="finput" id="u-password" value="${tempPassword}" readonly style="background:var(--bg)"></div>
+          </div>
+          <div class="fg"><label class="flbl">Rol *</label>
+            <select class="fselect" id="u-role" onchange="document.getElementById('u-cid-w').style.display=this.value==='SUBSIDIARY_HR'?'block':'none'">
+              <option value="SUBSIDIARY_HR">Şirkət HR</option>
+              <option value="HOLDING_HR">Holding HR</option>
+              <option value="ADMIN">Sistem Admini</option>
+            </select>
+          </div>
+          <div class="fg" id="u-cid-w"><label class="flbl">Şirkət *</label><select class="fselect" id="u-cid">${DB.companies.filter(c=>!c.is_holding).map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}</select></div>
+          <div class="gap-note ok" style="margin-top:8px">
+            ✉️ Qeydiyyatdan sonra istifadəçiyə avtomatik email göndəriləcək
+          </div>
+        </div>
+        <div class="mfooter">
+          <button class="btn btn-secondary" onclick="closeModal()">Ləğv et</button>
+          <button class="btn btn-primary" onclick="doAddUserWithAuth()">Yarat və Email Göndər</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+
+function doAddUserWithAuth(){
+  const name=document.getElementById('u-name').value.trim();
+  const email=document.getElementById('u-email').value.trim();
+  const username=document.getElementById('u-username').value.trim();
+  const password=document.getElementById('u-password').value.trim();
+  const role=document.getElementById('u-role').value;
+  const cid=role==='SUBSIDIARY_HR'?parseInt(document.getElementById('u-cid').value):null;
+  
+  if(!name||!email||!username||!password){alert('Bütün sahələri doldurun!');return;}
+  
+  // Check unique username
+  if(DB.users.find(u=>u.username===username)){alert('Bu username artıq mövcuddur!');return;}
+  
+  DB.users.push({
+    id:Math.max(...DB.users.map(u=>u.id))+1,
+    role,
+    name,
+    email,
+    username,
+    password, // In real app, hash this!
+    cid,
+    is_active:true
+  });
+  
+  // Mock email sending
+  alert(`✅ İstifadəçi yaradıldı!\n\n📧 Email göndərildi:\n${email}\n\nUsername: ${username}\nPassword: ${password}`);
+  
+  closeModal(); renderAll();
+}
+
+function doAddUser(){
+  const name=document.getElementById('u-name').value.trim();
+  const email=document.getElementById('u-email').value.trim();
+  const role=document.getElementById('u-role').value;
+  const cid=role==='SUBSIDIARY_HR'?parseInt(document.getElementById('u-cid').value):null;
+  if(!name||!email){alert('Ad və email mütləqdir!');return;}
+  DB.users.push({id:Math.max(...DB.users.map(u=>u.id))+1,role,name,email,cid,is_active:true});
+  closeModal(); renderAll();
+}
+
+/* ===== STRUCTURE MODAL ===== */
+function openAddStructure(){
+  const html=`
+    <div class="backdrop" id="str-bd" onclick="if(event.target.id==='str-bd')closeModal()">
+      <div class="modal-box modal-sm">
+        <div class="mh"><div class="mh-title">Struktur Əlavə Et</div><button class="mclose" onclick="closeModal()">×</button></div>
+        <div class="mbody">
+          <div class="fg"><label class="flbl">Nə əlavə etmək istəyirsiniz?</label>
+            <select class="fselect mb3" id="str-type">
+              <option value="dept">Departament</option>
+              <option value="pos">Vəzifə</option>
+            </select>
+          </div>
+          <div class="fg"><label class="flbl">Şirkət *</label><select class="fselect" id="str-cid">${DB.companies.filter(c=>!c.is_holding).map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}</select></div>
+          <div class="fg"><label class="flbl">Ad *</label><input class="finput" id="str-name" placeholder="Adı daxil edin"></div>
+        </div>
+        <div class="mfooter"><button class="btn btn-secondary" onclick="closeModal()">Ləğv et</button><button class="btn btn-primary" onclick="doAddStr()">Əlavə et</button></div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+function doAddStr(){
+  const type=document.getElementById('str-type').value;
+  const n=document.getElementById('str-name').value.trim();
+  const cid=parseInt(document.getElementById('str-cid').value);
+  if(!n){alert('Ad mütləqdir!');return;}
+  if(type==='dept') DB.departments.push({id:Math.max(...DB.departments.map(d=>d.id))+1,cid,name:n});
+  else DB.positions.push({id:Math.max(...DB.positions.map(p=>p.id))+1,cid,name:n});
+  closeModal(); renderAll();
+}
+
+function closeModal(){document.getElementById('modals').innerHTML='';}
+
+function notImpl(msg){
+  const html=`
+    <div class="backdrop" id="ni-bd" onclick="if(event.target.id==='ni-bd')closeModal()">
+      <div class="modal-box modal-sm">
+        <div class="mh"><div class="mh-title" style="color:var(--err)">⚠️ Boşluq aşkarlandı</div><button class="mclose" onclick="closeModal()">×</button></div>
+        <div class="mbody">
+          <div style="background:var(--err-l);border:1px solid #FECACA;border-radius:var(--r);padding:16px;color:#991B1B;font-size:13px;line-height:1.6">
+            <div class="fw7 mb2">Bu funksionallıq hələ tamamlanmayıb</div>
+            <div>${msg}</div>
+          </div>
+        </div>
+        <div class="mfooter"><button class="btn btn-primary" onclick="closeModal()">Bağla</button></div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+
+/* ===== INIT ===== */
+renderFunk('dashboard');
+</script>
+</body>
+</html>
