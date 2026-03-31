@@ -490,8 +490,9 @@ const DB = {
       insurance_type:'Özəl',insurance_company:'Atəşgah',insurance_number:'INS123456',insurance_date:'2024-01-01',
       blood_group:'A+',chronic_diseases:'Yox',allergies:'Yox',disability:false,disability_percent:0,
       work_schedule:'Tam',work_location:'Ofis',manager_id:null,has_subordinates:false,is_reserve:false,
-      industry_certificates:[{name:'Təhlükəsizlik sertifikatı',number:'TS-12345',issue_date:'2023-01-01',expiry_date:'2025-01-01'}]
+      tax_exemption:'Yoxdur',is_veteran:false,disability_group:'',citizenship:'Azərbaycan',industry_certificates:[{name:'Təhlükəsizlik sertifikatı',number:'TS-12345',issue_date:'2023-01-01',expiry_date:'2025-01-01'}]
     },
+tax_exemption:'Yoxdur',is_veteran:false,disability_group:'',citizenship:'Azərbaycan',
     {id:2,cid:2,fn:'Leyla',ln:'Məmmədova',fan:'Əli',fin:'3BT9L2Y',bd:'1994-11-30',gender:'Qadın',status:'ACTIVE',did:2,pid:3,hire:'2021-07-01',probation_end_date:'2021-10-01',phone:'+994 70 234 56 78',email:'l.mammadova@azartech.az',addr:'Bakı, Xətai r., Xaqani 22',salary:1800,photo_path:null,files:[],contract_file:null,
       marital_status:'Subay',children_count:0,military_service:'Xidmət etməyib',military_rank:'',
       id_serial:'A',id_number:'234567',id_issue_date:'2019-05-20',id_expiry_date:'2029-05-20',
@@ -627,7 +628,7 @@ const DB = {
     {id:3,eid:2,company:'ABB Bank',pos:'Mühasib köməkçisi',sd:'2016-09-01',ed:'2021-06-30',reason:'Karyera inkişafı',certificate_file:null},
   ],
   family:[
-    {id:1,eid:1,rel:'Həyat yoldaşı',name:'Sevinc Həsənova',contact:'+994 55 987 65 43'},
+    {id:1,eid:1,rel:'Həyat yoldaşı',name:'Sevinc Həsənova',contact:'+994 55 987 65 43',works_in_holding:false,works_company:'',works_position:''},
     {id:2,eid:1,rel:'Ata',name:'Rauf Həsənov',contact:'+994 70 111 22 33'},
     {id:3,eid:2,rel:'Ana',name:'Kəmalə Məmmədova',contact:'+994 51 444 55 66'},
   ],
@@ -1838,6 +1839,15 @@ function renderPersonalTab(e){
         ${fvItem('Hərbi rütbə',e.military_rank||'—')}
       </div>
     `)}
+
+    ${fvSection('📋 Vergi Statusu',`
+      <div class="fv-grid">
+        ${fvItem('Vergidən azadolma',e.tax_exemption?e.tax_exemption:'Yoxdur')}
+        ${fvItem('Əlillik',e.disability?'Əlil ('+e.disability_group+' qrup, '+e.disability_percent+'%)':'Yoxdur')}
+        ${fvItem('Veteran statusu',e.is_veteran?'✅ Veteran':'Yoxdur')}
+        ${fvItem('Vətəndaşlıq',e.citizenship||'Azərbaycan')}
+      </div>
+    `)}
     
     ${fvSection('📞 Əlaqə Məlumatları',`
       <div class="fv-grid">
@@ -2249,7 +2259,7 @@ function renderFamilyTab(e){
   const fams = DB.family.filter(x=>x.eid===e.id);
   const rows = fams.map(f=>`<div class="li-item">
     <div class="li-icon" style="background:var(--ok-l);color:var(--ok)">👤</div>
-    <div style="flex:1"><div class="fw6">${f.name}</div><div class="small muted">${f.rel}</div><div class="xsmall" style="color:var(--t3)">${f.contact}</div></div>
+    <div style="flex:1"><div class="fw6">${f.name}</div><div class="small muted">${f.rel}</div><div class="xsmall" style="color:var(--t3)">${f.contact}</div>${f.works_in_holding?'<div class="xsmall" style="color:var(--warn);margin-top:2px">⚠️ Holdinqdə işləyir: '+f.works_company+' ('+f.works_position+')</div>':''}</div>
     <button class="btn btn-ghost btn-xs" onclick="openEditFamilyModal(${f.id})">✎</button>
   </div>`).join('');
   return `
@@ -2366,6 +2376,28 @@ function renderExperienceTab(e){
   </div>`).join('');
   return `
     <div class="tab-content-wrapper">
+    ${(()=>{
+      const exps=DB.experience.filter(x=>x.eid===e.id);
+      if(!exps.length) return '';
+      let totalMonths=0,holdingMonths=0,prevMonths=0;
+      const hireDate=e.hire?new Date(e.hire):null;
+      exps.forEach(ex=>{
+        const sd=new Date(ex.sd);
+        const ed=ex.ed?new Date(ex.ed):new Date();
+        const m=(ed.getFullYear()-sd.getFullYear())*12+(ed.getMonth()-sd.getMonth());
+        totalMonths+=m;
+        if(hireDate && sd>=hireDate) holdingMonths+=m;
+        else prevMonths+=m;
+      });
+      const fmt=m=>{const y=Math.floor(m/12);const r=m%12;return y+' il '+(r?r+' ay':'');};
+      return `<div class="card mb4" style="border-left:4px solid var(--accent)">
+        <div class="grid3">
+          <div style="text-align:center"><div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Ümumi staj</div><div style="font-size:22px;font-weight:700;color:var(--accent)">${fmt(totalMonths)}</div></div>
+          <div style="text-align:center"><div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Holdinqdə</div><div style="font-size:22px;font-weight:700;color:var(--ok)">${fmt(holdingMonths)}</div></div>
+          <div style="text-align:center"><div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px">Əvvəlki müəssisələrdə</div><div style="font-size:22px;font-weight:700;color:var(--t2)">${fmt(prevMonths)}</div></div>
+        </div>
+      </div>`;
+    })()}
     <div class="sec-h"><div class="sec-title">İş təcrübəsi</div><button class="btn btn-primary btn-sm" onclick="openAddExpModal(${e.id})">+ Əlavə et</button></div>
     ${rows||`<div class="empty-s"><div class="ei">💼</div><h3>Təcrübə qeydləri yoxdur</h3></div>`}
     <div class="gap-note mt4 ok">✓ İş sertifikatı yükləmə funksiyası planlaşdırılır</div>
