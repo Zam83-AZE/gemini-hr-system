@@ -1886,28 +1886,64 @@ function openEditPersonalModal(eid){
       <div class="modal-box modal-md">
         <div class="mh"><div class="mh-title">✎ Şəxsi Məlumatları Redaktə</div><button class="mclose" onclick="closeEditModal()">×</button></div>
         <div class="mbody">
+          <!-- Əsas məlumatlar -->
+          <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">👤 Əsas Məlumatlar</div>
           <div class="frow">
             <div class="fg"><label class="flbl">Ad *</label><input class="finput" id="ep-fn" value="${e.fn}"></div>
             <div class="fg"><label class="flbl">Soyad *</label><input class="finput" id="ep-ln" value="${e.ln}"></div>
           </div>
           <div class="frow">
             <div class="fg"><label class="flbl">Ata adı</label><input class="finput" id="ep-fan" value="${e.fan||''}"></div>
-            <div class="fg"><label class="flbl">FİN</label><input class="finput" id="ep-fin" value="${e.fin}" disabled></div>
+            <div class="fg"><label class="flbl">FİN</label><input class="finput" id="ep-fin" value="${e.fin}" disabled style="background:var(--bg)"></div>
           </div>
           <div class="frow">
             <div class="fg"><label class="flbl">Doğum tarixi</label><input type="date" class="finput" id="ep-bd" value="${e.bd||''}"></div>
             <div class="fg"><label class="flbl">Cins</label><select class="fselect" id="ep-gender"><option value="">Seçin</option><option ${e.gender==='Kişi'?'selected':''}>Kişi</option><option ${e.gender==='Qadın'?'selected':''}>Qadın</option></select></div>
           </div>
+          <div class="divider"></div>
+          <!-- Ailə vəziyyəti -->
+          <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">💍 Ailə Vəziyyəti</div>
+          <div class="frow">
+            <div class="fg"><label class="flbl">Ailə vəziyyəti</label><select class="fselect" id="ep-marital"><option value="">Seçin</option><option ${e.marital_status==='Subay'?'selected':''}>Subay</option><option ${e.marital_status==='Evli'?'selected':''}>Evli</option><option ${e.marital_status==='Boşanmış'?'selected':''}>Boşanmış</option><option ${e.marital_status==='Dul'?'selected':''}>Dul</option></select></div>
+            <div class="fg"><label class="flbl">Uşaqların sayı</label><input type="number" class="finput" id="ep-children" value="${e.children_count||0}" min="0"></div>
+          </div>
+          <div class="frow">
+            <div class="fg"><label class="flbl">Hərbi xidmət</label><select class="fselect" id="ep-military"><option value="">Seçin</option><option ${e.military_service==='Xidmət edib'?'selected':''}>Xidmət edib</option><option ${e.military_service==='Xidmət etməyib'?'selected':''}>Xidmət etməyib</option><option ${e.military_service==='Ehtiyatda'?'selected':''}>Ehtiyatda</option></select></div>
+            <div class="fg"><label class="flbl">Hərbi rütbə</label><input class="finput" id="ep-rank" value="${e.military_rank||''}" placeholder="Rütbə"></div>
+          </div>
+          <div class="divider"></div>
+          <!-- Vergi statusu -->
+          <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">📋 Vergi Statusu</div>
+          <div class="frow">
+            <div class="fg"><label class="flbl">Vergidən azadolma</label><select class="fselect" id="ep-tax"><option ${!e.tax_exemption||e.tax_exemption==='Yoxdur'?'selected':''}>Yoxdur</option><option ${e.tax_exemption==='Veteran'?'selected':''}>Veteran</option><option ${e.tax_exemption==='Əlil'?'selected':''}>Əlil</option><option ${e.tax_exemption==='Müharibə veteranı'?'selected':''}>Müharibə veteranı</option></select></div>
+            <div class="fg"><label class="flbl">Vətəndaşlıq</label><input class="finput" id="ep-citizenship" value="${e.citizenship||'Azərbaycan'}" placeholder="Ölkə"></div>
+          </div>
+          <div class="frow">
+            <div class="fg"><label class="flbl">Veteran statusu</label><select class="fselect" id="ep-veteran"><option ${!e.is_veteran?'selected':''}>Xeyr</option><option ${e.is_veteran?'selected':''}>Bəli</option></select></div>
+            <div class="fg"><label class="flbl">Əlillik qrupu</label><select class="fselect" id="ep-disability"><option ${!e.disability?'selected':''}>Yoxdur</option><option ${e.disability_group==='I'?'selected':''}>I qrup</option><option ${e.disability_group==='II'?'selected':''}>II qrup</option><option ${e.disability_group==='III'?'selected':''}>III qrup</option></select></div>
+          </div>
+          <div class="divider"></div>
+          <!-- Əlaqə -->
+          <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">📞 Əlaqə</div>
           <div class="fg"><label class="flbl">Mobil nömrələr</label><input class="finput" id="ep-phone" value="${(e.mobile_numbers||[]).join(', ')}" placeholder="+994 XX XXX XX XX, +994 XX XXX XX XX"><div class="fhint">Bir neçə nömrə vergül ilə ayırın</div></div>
           <div class="frow">
             <div class="fg"><label class="flbl">Ev nömrəsi</label><input class="finput" id="ep-home-phone" value="${e.home_phone||''}" placeholder="+994 XX XXX XX XX"></div>
             <div class="fg"><label class="flbl">İş nömrəsi</label><input class="finput" id="ep-work-phone" value="${e.work_phone||''}" placeholder="+994 XX XXX XX XX"></div>
           </div>
+          <div class="fg"><label class="flbl">Email</label><input type="email" class="finput" id="ep-email" value="${e.email||''}"></div>
+          <div class="divider"></div>
+          <!-- Ünvanlar -->
+          <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">📍 Ünvanlar</div>
+          <div class="fg"><label class="flbl">Faktiki ünvan</label><input class="finput" id="ep-fact-addr" value="${e.fact_address||e.addr||''}" placeholder="Faktiki yaşayış ünvanı"></div>
+          <div class="fg"><label class="flbl">Qeydiyyat ünvanı</label><input class="finput" id="ep-reg-addr" value="${e.reg_address||''}" placeholder="Qeydiyyat ünvanı"></div>
+          <div class="divider"></div>
+          <!-- Ehtiyat əlaqə -->
+          <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🆘 Ehtiyat Əlaqə</div>
           <div class="frow">
-            <div class="fg"><label class="flbl">Email</label><input type="email" class="finput" id="ep-email" value="${e.email||''}"></div>
-            <div></div>
+            <div class="fg"><label class="flbl">Ad Soyad</label><input class="finput" id="ep-ec-name" value="${e.emergency_contact?.name||''}" placeholder="Ad Soyad"></div>
+            <div class="fg"><label class="flbl">Əlaqə növü</label><select class="fselect" id="ep-ec-rel"><option value="">Seçin</option><option ${e.emergency_contact?.relation==='Həyat yoldaşı'?'selected':''}>Həyat yoldaşı</option><option ${e.emergency_contact?.relation==='Ata'?'selected':''}>Ata</option><option ${e.emergency_contact?.relation==='Ana'?'selected':''}>Ana</option><option ${e.emergency_contact?.relation==='Qardaş'?'selected':''}>Qardaş</option><option ${e.emergency_contact?.relation==='Bacı'?'selected':''}>Bacı</option><option ${e.emergency_contact?.relation==='Digər'?'selected':''}>Digər</option></select></div>
           </div>
-          <div class="fg"><label class="flbl">Yaşayış ünvanı</label><input class="finput" id="ep-addr" value="${e.addr||''}"></div>
+          <div class="fg"><label class="flbl">Telefon</label><input class="finput" id="ep-ec-phone" value="${e.emergency_contact?.phone||''}" placeholder="+994 XX XXX XX XX"></div>
         </div>
         <div class="mfooter">
           <button class="btn btn-secondary" onclick="closeEditModal()">Ləğv et</button>
@@ -1927,23 +1963,51 @@ function doEditPersonal(eid){
   const gender=document.getElementById('ep-gender').value;
   const phone=document.getElementById('ep-phone').value.trim();
   const email=document.getElementById('ep-email').value.trim();
-  const addr=document.getElementById('ep-addr').value.trim();
-  
+  const marital=document.getElementById('ep-marital').value;
+  const children=parseInt(document.getElementById('ep-children').value)||0;
+  const military=document.getElementById('ep-military').value;
+  const rank=document.getElementById('ep-rank').value.trim();
+  const tax=document.getElementById('ep-tax').value;
+  const citizenship=document.getElementById('ep-citizenship').value.trim();
+  const veteran=document.getElementById('ep-veteran').value==='Bəli';
+  const disability=document.getElementById('ep-disability').value;
+  const homePhone=document.getElementById('ep-home-phone').value.trim();
+  const workPhone=document.getElementById('ep-work-phone').value.trim();
+  const factAddr=document.getElementById('ep-fact-addr').value.trim();
+  const regAddr=document.getElementById('ep-reg-addr').value.trim();
+  const ecName=document.getElementById('ep-ec-name').value.trim();
+  const ecRel=document.getElementById('ep-ec-rel').value;
+  const ecPhone=document.getElementById('ep-ec-phone').value.trim();
+
   if(!fn||!ln){alert('Ad və soyad mütləqdir!');return;}
-  
+
   if(e.fn!==fn) logAudit(eid,'fn',e.fn,fn,'Ad dəyişdirildi');
   if(e.ln!==ln) logAudit(eid,'ln',e.ln,ln,'Soyad dəyişdirildi');
   if(e.fan!==fan) logAudit(eid,'fan',e.fan,fan,'Ata adı dəyişdirildi');
   if(e.bd!==bd) logAudit(eid,'bd',e.bd,bd,'Doğum tarixi dəyişdirildi');
   if(e.gender!==gender) logAudit(eid,'gender',e.gender,gender,'Cins dəyişdirildi');
-  const homePhone=document.getElementById('ep-home-phone').value.trim();
-  const workPhone=document.getElementById('ep-work-phone').value.trim();
+  if(e.marital_status!==marital) logAudit(eid,'marital_status',e.marital_status,marital,'Ailə vəziyyəti dəyişdirildi');
+  if(e.children_count!==children) logAudit(eid,'children_count',e.children_count,children,'Uşaqlar sayı dəyişdirildi');
+  if(e.military_service!==military) logAudit(eid,'military_service',e.military_service,military,'Hərbi xidmət dəyişdirildi');
+  if(e.military_rank!==rank) logAudit(eid,'military_rank',e.military_rank,rank,'Hərbi rütbə dəyişdirildi');
+  if(e.tax_exemption!==tax) logAudit(eid,'tax_exemption',e.tax_exemption,tax,'Vergi statusu dəyişdirildi');
+  if(e.citizenship!==citizenship) logAudit(eid,'citizenship',e.citizenship,citizenship,'Vətəndaşlıq dəyişdirildi');
+  if(e.is_veteran!==veteran) logAudit(eid,'is_veteran',e.is_veteran,veteran,'Veteran statusu dəyişdirildi');
   const phones=phone.split(',').map(p=>p.trim()).filter(p=>p);
   if(JSON.stringify(e.mobile_numbers||[])!==JSON.stringify(phones)) logAudit(eid,'mobile_numbers',JSON.stringify(e.mobile_numbers),JSON.stringify(phones),'Mobil nömrələr dəyişdirildi');
   if(e.email!==email) logAudit(eid,'email',e.email,email,'Email dəyişdirildi');
-  if(e.addr!==addr) logAudit(eid,'addr',e.addr,addr,'Ünvan dəyişdirildi');
-  
-  e.fn=fn;e.ln=ln;e.fan=fan;e.bd=bd;e.gender=gender;e.mobile_numbers=phones;e.home_phone=homePhone;e.work_phone=workPhone;e.email=email;e.addr=addr;
+  if((e.fact_address||e.addr)!==factAddr) logAudit(eid,'fact_address',e.fact_address||e.addr,factAddr,'Faktiki ünvan dəyişdirildi');
+  if(e.reg_address!==regAddr) logAudit(eid,'reg_address',e.reg_address,regAddr,'Qeydiyyat ünvanı dəyişdirildi');
+
+  e.fn=fn;e.ln=ln;e.fan=fan;e.bd=bd;e.gender=gender;
+  e.marital_status=marital;e.children_count=children;
+  e.military_service=military;e.military_rank=rank;
+  e.tax_exemption=tax;e.citizenship=citizenship;e.is_veteran=veteran;
+  if(disability!=='Yoxdur'){e.disability=true;e.disability_group=disability;}else{e.disability=false;e.disability_group='';}
+  e.mobile_numbers=phones;e.home_phone=homePhone;e.work_phone=workPhone;
+  e.email=email;e.fact_address=factAddr;e.reg_address=regAddr;e.addr=factAddr;
+  e.emergency_contact={name:ecName,phone:ecPhone,relation:ecRel};
+
   closeEditModal();
   renderCard();
   renderAll();
