@@ -631,6 +631,10 @@ const DB = {
     {id:2,eid:1,rel:'Ata',name:'Rauf Həsənov',contact:'+994 70 111 22 33'},
     {id:3,eid:2,rel:'Ana',name:'Kəmalə Məmmədova',contact:'+994 51 444 55 66'},
   ],
+  conflicts:[
+    {id:1,eid:1,type:'Qohum',rel:'Qardaş',name:'Elçin Həsənov',company:'Azman Construction',position:'Layihə menecer',details:'Eyni şirkətdə işləyir'},
+    {id:2,eid:5,type:'Tanış',rel:'',name:'Kənan Məmmədov',company:'TEZ Logistics',position:'Şöbə müdiri',details:'Universitetdən tanışdır'},
+  ],
   auditLog:[
     {id:1,eid:1,uid:2,field:'status',old_value:null,new_value:'CANDIDATE',desc:'Namizəd profilsı yaradıldı',date:'2022-02-28'},
     {id:2,eid:1,uid:2,field:'status',old_value:'CANDIDATE',new_value:'ACTIVE',desc:'İşə qəbul edildi',date:'2022-03-15'},
@@ -848,6 +852,12 @@ const FUNK = {
     {s:'ok',t:'Ailə üzvlərini gör',n:'Qohumluq dərəcəsi, əlaqə'},
     {s:'ok',t:'Ailə üzvü əlavə et',n:''},
     {s:'ok',t:'Ailə üzvünü redaktə et',n:'Tam işlək'},
+  ]},
+  'card-conflict':{ctx:'Profil — Maraqların Toqquşması',items:[
+    {s:'ok',t:'Maraqların toqquşması qeydlərini gör',n:'Qohum və tanış ayrılıqda'},
+    {s:'ok',t:'Qohum əlavə et',n:'Şirkət, vəzifə, qohumluq dərəcəsi'},
+    {s:'ok',t:'Tanış əlavə et',n:'Şirkət, vəzifə, tanışlıq növü'},
+    {s:'ok',t:'Qeydi redaktə et / sil',n:'Tam CRUD əməliyyatı'},
   ]},
   'card-corporate':{ctx:'Profil — Korporativ',items:[
     {s:'ok',t:'Departament, vəzifə, şirkət gör',n:''},
@@ -1733,6 +1743,7 @@ function renderCard(){
     {id:'education',label:'Təhsil'},
     {id:'experience',label:'Təcrübə'},
     {id:'family',label:'Ailə'},
+    {id:'conflict',label:'⚠️ Maraqların Toqquşması'},
     {id:'corporate',label:'Korporativ'},
     {id:'certificates',label:'Sertifikatlar'},
     {id:'lifecycle',label:'Tarixçə'},
@@ -1803,6 +1814,7 @@ function renderCardTab(e){
   if(S.etab==='education') return renderEducationTab(e);
   if(S.etab==='experience') return renderExperienceTab(e);
   if(S.etab==='family') return renderFamilyTab(e);
+  if(S.etab==='conflict') return renderConflictTab(e);
   if(S.etab==='corporate') return renderCorporateTab(e);
   if(S.etab==='certificates') return renderCertificatesTab(e);
   if(S.etab==='lifecycle') return renderLifecycleTab(e);
@@ -1944,6 +1956,19 @@ function openEditPersonalModal(eid){
             <div class="fg"><label class="flbl">Əlaqə növü</label><select class="fselect" id="ep-ec-rel"><option value="">Seçin</option><option ${e.emergency_contact?.relation==='Həyat yoldaşı'?'selected':''}>Həyat yoldaşı</option><option ${e.emergency_contact?.relation==='Ata'?'selected':''}>Ata</option><option ${e.emergency_contact?.relation==='Ana'?'selected':''}>Ana</option><option ${e.emergency_contact?.relation==='Qardaş'?'selected':''}>Qardaş</option><option ${e.emergency_contact?.relation==='Bacı'?'selected':''}>Bacı</option><option ${e.emergency_contact?.relation==='Digər'?'selected':''}>Digər</option></select></div>
           </div>
           <div class="fg"><label class="flbl">Telefon</label><input class="finput" id="ep-ec-phone" value="${e.emergency_contact?.phone||''}" placeholder="+994 XX XXX XX XX"></div>
+          <div class="divider"></div>
+          <!-- Maraqların Toqquşması -->
+          <div style="font-size:11px;font-weight:700;color:var(--warn);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">⚠️ Maraqların Toqquşması</div>
+          <div class="gap-note ${DB.conflicts.filter(c=>c.eid===e.id).length>0?'':'ok'}" style="margin-bottom:12px">${DB.conflicts.filter(c=>c.eid===e.id).length>0?'⚠️ Bu əməkdaş üçün '+DB.conflicts.filter(c=>c.eid===e.id).length+' maraqların toqquşması qeydi mövcuddur. Detallar üçün "Maraqların Toqquşması" tab-ına baxın.':'✅ Maraqların toqquşması qeydi yoxdur.'}</div>
+          <div class="fg"><label class="flbl">Holdinqdə qohumu/tanışı var?</label><select class="fselect" id="ep-has-conflict" onchange="document.getElementById('ep-conflict-quick').style.display=this.value==='Bəli'?'block':'none'"><option value="Xeyr">Xeyr</option><option value="Bəli">Bəli — Sürətli əlavə</option></select><div class="fhint">Tam redaktə üçün "Maraqların Toqquşması" tab-ına keçin</div></div>
+          <div id="ep-conflict-quick" style="display:none">
+            <div class="fg"><label class="flbl">Növ</label><select class="fselect" id="ep-conflict-type"><option>Qohum</option><option>Tanış</option></select></div>
+            <div class="fg"><label class="flbl">Ad Soyad *</label><input class="finput" id="ep-conflict-name" placeholder="Ad Soyad"></div>
+            <div class="frow">
+              <div class="fg"><label class="flbl">Şirkət</label><select class="fselect" id="ep-conflict-company">${DB.companies.filter(c=>!c.is_holding).map(c=>`<option>${c.name}</option>`).join('')}</select></div>
+              <div class="fg"><label class="flbl">Vəzifə</label><input class="finput" id="ep-conflict-position" placeholder="Vəzifə"></div>
+            </div>
+          </div>
         </div>
         <div class="mfooter">
           <button class="btn btn-secondary" onclick="closeEditModal()">Ləğv et</button>
@@ -2007,6 +2032,23 @@ function doEditPersonal(eid){
   e.mobile_numbers=phones;e.home_phone=homePhone;e.work_phone=workPhone;
   e.email=email;e.fact_address=factAddr;e.reg_address=regAddr;e.addr=factAddr;
   e.emergency_contact={name:ecName,phone:ecPhone,relation:ecRel};
+
+  // Save quick conflict of interest if added
+  const editHasConflict = document.getElementById('ep-has-conflict')?.value==='Bəli';
+  if(editHasConflict){
+    const editConflictName = document.getElementById('ep-conflict-name')?.value.trim();
+    if(editConflictName){
+      const conflictId = DB.conflicts.length>0 ? Math.max(...DB.conflicts.map(x=>x.id))+1 : 1;
+      DB.conflicts.push({
+        id:conflictId, eid, type:document.getElementById('ep-conflict-type')?.value||'Qohum',
+        rel:'', name:editConflictName,
+        company:document.getElementById('ep-conflict-company')?.value||'',
+        position:document.getElementById('ep-conflict-position')?.value.trim()||'',
+        details:'Şəxsi məlumatlardan sürətli əlavə'
+      });
+      logAudit(eid,'conflict_of_interest',null,editConflictName,'Maraqların toqquşması qeydi əlavə edildi (sürətli)');
+    }
+  }
 
   closeEditModal();
   renderCard();
@@ -2573,6 +2615,169 @@ function deleteFamily(id){
   DB.family=DB.family.filter(x=>x.id!==id);
   document.getElementById('modals').innerHTML='';
   openCard(eid,'family');
+}
+
+/* ===== CONFLICT OF INTEREST FUNCTIONS ===== */
+function renderConflictTab(e){
+  const items = DB.conflicts.filter(x=>x.eid===e.id);
+  const rows = items.map(c=>{
+    const isQohum = c.type==='Qohum';
+    const iconBg = isQohum ? 'var(--warn-l)' : 'var(--accent-l)';
+    const iconColor = isQohum ? 'var(--warn)' : 'var(--accent)';
+    const icon = isQohum ? '👨‍👩‍👦' : '🤝';
+    const typePill = isQohum
+      ? '<span class="fv-pill fv-pill-ok">Qohum</span>'
+      : '<span class="fv-pill" style="background:var(--accent-l);color:var(--accent)">Tanış</span>';
+    return `<div class="li-item">
+      <div class="li-icon" style="background:${iconBg};color:${iconColor}">${icon}</div>
+      <div style="flex:1">
+        <div class="fw6">${c.name} ${typePill}</div>
+        <div class="small muted">${c.rel ? c.rel+' — ' : ''}${c.company}${c.position?', '+c.position:''}</div>
+        ${c.details?'<div class="xsmall" style="color:var(--t3);margin-top:2px">📝 '+c.details+'</div>':''}
+      </div>
+      <button class="btn btn-ghost btn-xs" onclick="openEditConflictModal(${c.id})">✎</button>
+    </div>`;
+  }).join('');
+  const conflictCount = items.length;
+  const hasConflict = conflictCount > 0;
+  return `
+    <div class="tab-content-wrapper">
+    ${fvSection('⚠️ Maraqların Toqquşması — Ümumi Məlumat',`
+      <div class="fv-grid">
+        <div class="fv-item">
+          <div class="fv-label">Holdinqdə qohum/tanış var?</div>
+          <div class="fv-value">${hasConflict
+            ? '<span class="fv-pill fv-pill-ok">Bəli ('+conflictCount+' nəfər)</span>'
+            : '<span class="fv-pill fv-pill-no">Xeyr</span>'}</div>
+        </div>
+        <div class="fv-item">
+          <div class="fv-label">Növü</div>
+          <div class="fv-value">${items.filter(x=>x.type==='Qohum').length>0?'<span style="color:var(--warn)">👨‍👩‍👦 Qohum: '+items.filter(x=>x.type==='Qohum').length+'</span>':'<span class="muted">Qohum yoxdur</span>'} ${items.filter(x=>x.type==='Tanış').length>0?'| <span style="color:var(--accent)">🤝 Tanış: '+items.filter(x=>x.type==='Tanış').length+'</span>':''}</div>
+        </div>
+      </div>
+    `)}
+    ${fvSection('📋 Qohum və Tanış Siyahısı',`
+      <div style="margin-bottom:12px;display:flex;gap:8px;justify-content:flex-end;align-items:center">
+        <button class="btn btn-warn btn-sm" onclick="openAddConflictModal(${e.id},'Qohum')">+ Qohum Əlavə</button>
+        <button class="btn btn-primary btn-sm" onclick="openAddConflictModal(${e.id},'Tanış')">+ Tanış Əlavə</button>
+      </div>
+      ${rows||`<div class="empty-s"><div class="ei">✅</div><h3>Maraqların toqquşması yoxdur</h3><p>Bu əməkdaşın holdinqdə qohumu və ya tanışı tapılmadı.</p></div>`}
+    `)}
+    </div>`;
+}
+
+function openAddConflictModal(eid, type){
+  const isQohum = type==='Qohum';
+  const relOptions = isQohum
+    ? ['Ata','Ana','Qardaş','Bacı','Övlad','Həyat yoldaşı','Amca','Xala','Dayı','Biçakçıəmi','Qohum (digər)'].map(r=>`<option>${r}</option>`).join('')
+    : ['Universitet yoldaşı','Məktəb yoldaşı','Keçmiş həmkar','Qonşu','Digər tanış'].map(r=>`<option>${r}</option>`).join('');
+  const html=`
+    <div class="backdrop" id="conf-bd" onclick="if(event.target.id==='conf-bd')closeCardModal(true)">
+      <div class="modal-box modal-sm">
+        <div class="mh"><div class="mh-title">${isQohum?'👨‍👩‍👦 Qohum Əlavə Et':'🤝 Tanış Əlavə Et'}</div><button class="mclose" onclick="closeCardModal(true)">×</button></div>
+        <div class="mbody">
+          <input type="hidden" id="conf-type" value="${type}">
+          <div class="fg"><label class="flbl">Ad Soyad *</label><input class="finput" id="conf-name" placeholder="Ad Soyad"></div>
+          <div class="fg"><label class="flbl">${isQohum?'Qohumluq dərəcəsi':'Tanışlıq növü'} *</label><select class="fselect" id="conf-rel">${relOptions}</select></div>
+          <div class="divider"></div>
+          <div style="font-size:11px;font-weight:700;color:var(--warn);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🏢 Holdinqdəki Məlumatları</div>
+          <div class="fg"><label class="flbl">Şirkət *</label><select class="fselect" id="conf-company">${DB.companies.filter(c=>!c.is_holding).map(c=>`<option>${c.name}</option>`).join('')}</select></div>
+          <div class="fg"><label class="flbl">Vəzifə</label><input class="finput" id="conf-position" placeholder="Vəzifə"></div>
+          <div class="fg"><label class="flbl">Əlavə qeyd</label><textarea class="ftextarea" id="conf-details" placeholder="Əlavə məlumat (istəyə bağlı)"></textarea></div>
+        </div>
+        <div class="mfooter">
+          <button class="btn btn-secondary" onclick="closeCardModal(true)">Ləğv et</button>
+          <button class="btn btn-primary" onclick="doAddConflict(${eid})">Əlavə et</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+
+function doAddConflict(eid){
+  const type=document.getElementById('conf-type').value;
+  const name=document.getElementById('conf-name').value.trim();
+  if(!name){alert('Ad mütləqdir!');return;}
+  const newId= DB.conflicts.length>0 ? Math.max(...DB.conflicts.map(x=>x.id))+1 : 1;
+  DB.conflicts.push({
+    id:newId, eid, type,
+    rel: document.getElementById('conf-rel').value,
+    name,
+    company: document.getElementById('conf-company').value,
+    position: document.getElementById('conf-position').value.trim(),
+    details: document.getElementById('conf-details').value.trim()
+  });
+  logAudit(eid,'conflict_of_interest',null,'Added: '+name+' ('+type+') at '+document.getElementById('conf-company').value,'Maraqların toqquşması qeydi əlavə edildi');
+  document.getElementById('modals').innerHTML='';
+  openCard(eid,'conflict');
+}
+
+function openEditConflictModal(id){
+  const c=DB.conflicts.find(x=>x.id===id);
+  if(!c) return;
+  const eid=c.eid;
+  const isQohum = c.type==='Qohum';
+  const relOptions = isQohum
+    ? ['Ata','Ana','Qardaş','Bacı','Övlad','Həyat yoldaşı','Amca','Xala','Dayı','Biçakçıəmi','Qohum (digər)'].map(r=>`<option ${r===c.rel?'selected':''}>${r}</option>`).join('')
+    : ['Universitet yoldaşı','Məktəb yoldaşı','Keçmiş həmkar','Qonşu','Digər tanış'].map(r=>`<option ${r===c.rel?'selected':''}>${r}</option>`).join('');
+  const html=`
+    <div class="backdrop" id="conf-bd" onclick="if(event.target.id==='conf-bd')closeCardModal(true)">
+      <div class="modal-box modal-sm">
+        <div class="mh"><div class="mh-title">${isQohum?'👨‍👩‍👦 Qohum Redaktə':'🤝 Tanış Redaktə'}</div><button class="mclose" onclick="closeCardModal(true)">×</button></div>
+        <div class="mbody">
+          <div class="fg"><label class="flbl">Növ</label><select class="fselect" id="conf-type" onchange="updateConflictRelOptions()"><option ${c.type==='Qohum'?'selected':''}>Qohum</option><option ${c.type==='Tanış'?'selected':''}>Tanış</option></select></div>
+          <div class="fg"><label class="flbl">Ad Soyad *</label><input class="finput" id="conf-name" value="${c.name}"></div>
+          <div class="fg"><label class="flbl">Qohumluq / Tanışlıq *</label><select class="fselect" id="conf-rel">${relOptions}</select></div>
+          <div class="divider"></div>
+          <div style="font-size:11px;font-weight:700;color:var(--warn);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">🏢 Holdinqdəki Məlumatları</div>
+          <div class="fg"><label class="flbl">Şirkət *</label><select class="fselect" id="conf-company">${DB.companies.filter(co=>!co.is_holding).map(co=>`<option ${co.name===c.company?'selected':''}>${co.name}</option>`).join('')}</select></div>
+          <div class="fg"><label class="flbl">Vəzifə</label><input class="finput" id="conf-position" value="${c.position||''}"></div>
+          <div class="fg"><label class="flbl">Əlavə qeyd</label><textarea class="ftextarea" id="conf-details">${c.details||''}</textarea></div>
+        </div>
+        <div class="mfooter">
+          <button class="btn btn-ghost text-err" onclick="deleteConflict(${id})">Sil</button>
+          <div style="flex:1"></div>
+          <button class="btn btn-secondary" onclick="closeCardModal(true)">Ləğv et</button>
+          <button class="btn btn-primary" onclick="doEditConflict(${id})">Yadda saxla</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('modals').innerHTML=html;
+}
+
+function updateConflictRelOptions(){
+  const type=document.getElementById('conf-type').value;
+  const isQohum = type==='Qohum';
+  const opts = isQohum
+    ? ['Ata','Ana','Qardaş','Bacı','Övlad','Həyat yoldaşı','Amca','Xala','Dayı','Biçakçıəmi','Qohum (digər)']
+    : ['Universitet yoldaşı','Məktəb yoldaşı','Keçmiş həmkar','Qonşu','Digər tanış'];
+  document.getElementById('conf-rel').innerHTML = opts.map(r=>`<option>${r}</option>`).join('');
+}
+
+function doEditConflict(id){
+  const c=DB.conflicts.find(x=>x.id===id);
+  if(!c) return;
+  const oldName=c.name;
+  c.type=document.getElementById('conf-type').value;
+  c.name=document.getElementById('conf-name').value.trim();
+  c.rel=document.getElementById('conf-rel').value;
+  c.company=document.getElementById('conf-company').value;
+  c.position=document.getElementById('conf-position').value.trim();
+  c.details=document.getElementById('conf-details').value.trim();
+  logAudit(c.eid,'conflict_of_interest',oldName,c.name,'Maraqların toqquşması qeydi redaktə edildi');
+  document.getElementById('modals').innerHTML='';
+  openCard(c.eid,'conflict');
+}
+
+function deleteConflict(id){
+  const c=DB.conflicts.find(x=>x.id===id);
+  if(!c) return;
+  if(!confirm('Bu qeydi silmək istədiyinizə əminsiniz?')) return;
+  const eid=c.eid;
+  logAudit(eid,'conflict_of_interest',c.name,null,'Maraqların toqquşması qeydi silindi');
+  DB.conflicts=DB.conflicts.filter(x=>x.id!==id);
+  document.getElementById('modals').innerHTML='';
+  openCard(eid,'conflict');
 }
 
 /* ===== EXPERIENCE FUNCTIONS ===== */
@@ -3208,6 +3413,15 @@ function openNewEmpModal(){
             <div id="cv-preview"></div>
           </div>
           ${isHolding()||isAdmin()?`<div class="fg"><label class="flbl">Şirkət *</label><select class="fselect" id="ne-cid">${DB.companies.filter(c=>!c.is_holding).map(c=>`<option value="${c.id}" ${c.id===cid?'selected':''}>${c.name}</option>`).join('')}</select></div>`:`<input type="hidden" id="ne-cid" value="${cid}">`}
+          <div class="divider"></div>
+          <div style="font-size:11px;font-weight:700;color:var(--warn);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">⚠️ Maraqların Toqquşması</div>
+          <div class="fg"><label class="flbl">Holdinqdə qohumu/tanışı var?</label><select class="fselect" id="ne-has-conflict" onchange="document.getElementById('ne-conflict-detail').style.display=this.value==='Bəli'?'block':'none'"><option value="Xeyr">Xeyr</option><option value="Bəli">Bəli</option></select></div>
+          <div id="ne-conflict-detail" style="display:none">
+            <div class="fg"><label class="flbl">Növ</label><select class="fselect" id="ne-conflict-type"><option>Qohum</option><option>Tanış</option></select></div>
+            <div class="fg"><label class="flbl">Ad Soyad</label><input class="finput" id="ne-conflict-name" placeholder="Ad Soyad"></div>
+            <div class="fg"><label class="flbl">Şirkət</label><select class="fselect" id="ne-conflict-company">${DB.companies.filter(c=>!c.is_holding).map(c=>`<option>${c.name}</option>`).join('')}</select></div>
+            <div class="fg"><label class="flbl">Vəzifə</label><input class="finput" id="ne-conflict-position" placeholder="Vəzifə"></div>
+          </div>
         </div>
         <div class="mfooter">
           <button class="btn btn-secondary" onclick="closeNewEmpModal()">Ləğv et</button>
@@ -3279,6 +3493,22 @@ function doCreateEmp(){
   DB.employees.push(newEmp);
   DB.lifecycle.push({eid:newId,uid:S.uid,old:null,new_s:'CANDIDATE',desc:'Namizəd profilsı yaradıldı',date:new Date().toISOString().split('T')[0]});
   logAudit(newId,'status',null,'CANDIDATE','Namizəd profilsı yaradıldı');
+  // Save conflict of interest if specified
+  const hasConflict = document.getElementById('ne-has-conflict')?.value==='Bəli';
+  if(hasConflict){
+    const conflictName = document.getElementById('ne-conflict-name')?.value.trim();
+    if(conflictName){
+      const conflictId = DB.conflicts.length>0 ? Math.max(...DB.conflicts.map(x=>x.id))+1 : 1;
+      DB.conflicts.push({
+        id:conflictId, eid:newId, type:document.getElementById('ne-conflict-type')?.value||'Qohum',
+        rel:'', name:conflictName,
+        company:document.getElementById('ne-conflict-company')?.value||'',
+        position:document.getElementById('ne-conflict-position')?.value.trim()||'',
+        details:'Namizəd mərhələsində qeyd edilib'
+      });
+      logAudit(newId,'conflict_of_interest',null,conflictName,'Maraqların toqquşması qeydi əlavə edildi');
+    }
+  }
   tempCVFile=null;
   closeNewEmpModal();
   S.tab='CANDIDATE'; S.view='employees';
